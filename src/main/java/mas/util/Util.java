@@ -1,6 +1,8 @@
 package mas.util;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Util {
@@ -29,5 +31,8 @@ public class Util {
         return start1.isBefore(end2) && start2.isBefore(end1);
     }
 
+    public static LocalDate getNextDayOfWeek(LocalDate date, DayOfWeek dayOfWeek) {
+        return date.plusDays(dayOfWeek.getValue() + 7 - date.getDayOfWeek().getValue() % 7);
+    }
 
 }

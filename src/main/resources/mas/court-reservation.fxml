@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane alignment="CENTER" hgap="10.0" vgap="10.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.CourtReservationController">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label alignment="CENTER" contentDisplay="CENTER" styleClass="title" stylesheets="@style.css" text="Rezerwacja kortu" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+    <DatePicker fx:id="datePicker" prefWidth="200.0" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+    <!-- Filters -->
+    <!-- Place your filter components here -->
+    <Label text="Tabela dostępności kortów" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+    <Label text="trener: " GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+    <Label text="Imię Nazwisko, stopień trenerski, CENA" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+    <TableView fx:id="availabilityTable" prefHeight="200.0" prefWidth="572.0" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+        <columns>
+            <TableColumn fx:id="courtNumberColumn" prefWidth="60.0" reorderable="false" text="Numer kortu" />
+            <TableColumn fx:id="priceColumn" prefWidth="90.0" reorderable="false" text="Cena za godzinę" />
+            <!-- Hour columns (programmatically) -->
+        </columns>
+    </TableView>
+    <VBox alignment="CENTER_LEFT" spacing="10.0" GridPane.rowIndex="4" GridPane.rowSpan="2">
+        <CheckBox fx:id="trainingCheckBox" text="Zarezerwuj trening z trenerem" />
+        <ComboBox fx:id="trainerComboBox" disable="true" prefWidth="200.0" />
+    </VBox>
+    <VBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.rowSpan="2" GridPane.valignment="CENTER">
+        <CheckBox fx:id="racketCheckBox" text="Racket Reservation" />
+        <ComboBox fx:id="racketComboBox" disable="true" prefWidth="200.0" />
+    </VBox>
+    <HBox alignment="CENTER_LEFT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+        <Label text="Total Price:" />
+        <Label fx:id="totalPriceLabel" text="" />
+    </HBox>
+    <Button mnemonicParsing="false" onAction="#showReservationSummary" text="Podsumowanie" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+    <TextArea fx:id="commentsTextArea" prefHeight="100.0" prefWidth="572.0" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+   <Label text="*filters*" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+    <stylesheets>
+        <URL value="@style.css" />
+    </stylesheets>
+</GridPane>

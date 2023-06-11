@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.StartController">
+   <top>
+      <Label styleClass="title" stylesheets="@style.css" text="Use Case Manager" BorderPane.alignment="CENTER" />
+   </top>
+   <center>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="SEED DB" />
+            <Button mnemonicParsing="false" prefHeight="50.0" prefWidth="150.0" text="RUN USE CASE" />
+         </children>
+      </HBox>
+   </center>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+</BorderPane>
