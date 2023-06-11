@@ -41,9 +41,11 @@ public class Training {
     private Set<Equipment> equipmentSet = new HashSet<>();
 
     @ManyToMany
+    @JoinTable(name = "trainings_clients")
     private Set<Person> clients = new HashSet<>();
 
     @ManyToMany
+    @JoinTable(name = "trainings_participants")
     private Set<Person> participants = new HashSet<>();
 
     private Training(LocalDateTime start, Duration duration, Trainer trainer, Court court,
@@ -88,7 +90,7 @@ public class Training {
     public static Training makeReservation(Person client, Person participant, Trainer trainer, Court court,
                                            LocalDateTime from, Duration duration) {
         if (!trainer.isAvailable(from, duration)) throw new TimeUnavailableException(trainer, from, duration);
-        if (court.isAvailable(from, duration)) throw new TimeUnavailableException(court, from, duration);
+        if (!court.isAvailable(from, duration)) throw new TimeUnavailableException(court, from, duration);
         if (!client.getPersonTypes().contains(Person.PersonType.Client))
             throw new TypeMismatchException("Person referred as client is not a Client instance");
         if (!participant.getPersonTypes().contains(Person.PersonType.Participant))

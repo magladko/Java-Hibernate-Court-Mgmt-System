@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import mas.util.StaticallyStored;
 import mas.util.Util;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +20,9 @@ import java.util.Set;
 public abstract class Court {
 
     public enum SurfaceType { Grass, Clay, Hard, ArtificialGrass }
+
+    @StaticallyStored private static LocalTime openingHour;
+    @StaticallyStored private static LocalTime closingHour;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -62,8 +62,15 @@ public class Reservation {
             throw new TimeUnavailableException(court, start, duration);
 
         var reservation = new Reservation(start, duration, court, null, participant, client);
+
         reservation.getClient().getReservationsBought().add(reservation);
         reservation.getParticipant().getReservations().add(reservation);
+
+        if (racket != null) {
+            reservation.setRacket(racket);
+            racket.getReservations().add(reservation);
+        }
+
         return reservation;
     }
 

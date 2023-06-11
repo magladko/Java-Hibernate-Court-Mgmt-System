@@ -10,6 +10,7 @@ import mas.util.TimeUnavailableException;
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Map;
 
 public class Main {
@@ -64,49 +65,69 @@ public class Main {
             entityManager.persist(participant1);
             entityManager.persist(participant2);
 
-            Trainer t1 = new Trainer("Jędrzej", "Kasztan", "423456789", "f@f.pl",
+            Trainer trainer1 = new Trainer("Jędrzej", "Kasztan", "423456789", "f@f.pl",
                                      Trainer.TrainerQualification.Animator, BigDecimal.valueOf(80),
                                      Map.of(DayOfWeek.SATURDAY, new WorkingHours(LocalTime.of(9, 0), LocalTime.of(17, 0))));
-            Trainer t2 = new Trainer("Zdzisław", "Wąski", "523456789", "xxx@f.pl",
+            Trainer trainer2 = new Trainer("Zdzisław", "Wąski", "523456789", "xxx@f.pl",
                                      Trainer.TrainerQualification.TrainerCoach, BigDecimal.valueOf(180),
                                      Map.of(DayOfWeek.SATURDAY, new WorkingHours(LocalTime.of(9, 0), LocalTime.of(17, 0)),
                                             DayOfWeek.MONDAY, new WorkingHours(LocalTime.of(17, 0), LocalTime.of(21, 0))));
 
-            entityManager.persist(t1);
-            entityManager.persist(t2);
+            entityManager.persist(trainer1);
+            entityManager.persist(trainer2);
 
             Training training1;
             Training training2;
 
+            entityManager.getTransaction().commit();
+            entityManager.getTransaction().begin();
+
+            Calendar calendar = Calendar.getInstance();
             try {
-                training1 = Training.makeReservation(client1, client1, t1, courts[0],
-                                                     LocalDateTime.of(LocalDateTime.now().plusDays(1).getYear(),
-                                                                      LocalDateTime.now().plusDays(1).getMonth(),
-                                                                      LocalDateTime.now()
-                                                                              .plusDays(1)
-                                                                              .getDayOfMonth(),
-                                                                      10, 0
-                                                     ), Duration.ofHours(1)
-                );
+                var dayOfWeek = trainer1.getWorkingHours().keySet().stream().findFirst().get().getValue() % 7 + 1;
+                calendar.add(Calendar.DAY_OF_MONTH, (dayOfWeek + 7 - calendar.get(Calendar.DAY_OF_WEEK)) % 7);
+
+//                calendar.set(Calendar.DAY_OF_WEEK, trainer1.getWorkingHours().keySet().stream().findFirst().get().getValue());
+                System.out.println(calendar.getTime());
+
+                training1 = Training.makeReservation(client1, client1, trainer1, courts[0],
+                                                     new java.sql.Date(calendar.getTime().getTime()).toLocalDate().atTime(10, 0),
+                                                     Duration.ofHours(1));
+
+                System.out.println(training1);
+                System.out.println(training1.getId());
+                System.out.println(training1.getTrainer());
+                System.out.println(training1.getClients());
+                System.out.println(training1.getParticipants());
 
                 entityManager.persist(training1);
+                entityManager.getTransaction().commit();
 
             } catch (TimeUnavailableException e) {
                 System.out.printf("Trainer is not available: %s%n", e.getMessage());
             }
+            entityManager.getTransaction().begin();
             try {
+                var dayOfWeek = trainer1.getWorkingHours().keySet().stream().findFirst().get().getValue() % 7 + 1;
+                calendar = Calendar.getInstance();
+                calendar.add(Calendar.DAY_OF_MONTH, (dayOfWeek + 7 - calendar.get(Calendar.DAY_OF_WEEK)) % 7);
 
-                training2 = Training.makeReservation(client1, participant1, t1, courts[1],
-                                                     LocalDateTime.of(LocalDateTime.now().plusDays(1).getYear(),
-                                                                      LocalDateTime.now().plusDays(1).getMonth(),
-                                                                      LocalDateTime.now()
-                                                                              .plusDays(1)
-                                                                              .getDayOfMonth(),
-                                                                      10, 0), Duration.ofHours(1));
+//                calendar.set(Calendar.DAY_OF_WEEK, trainer1.getWorkingHours().keySet().stream().findFirst().get().getValue());
+                System.out.println(calendar.getTime());
+
+                training2 = Training.makeReservation(client1, participant1, trainer1, courts[1],
+                                                     new java.sql.Date(calendar.getTime().getTime()).toLocalDate().atTime(11, 0),
+                                                     Duration.ofHours(1));
                 entityManager.persist(training2);
+                entityManager.getTransaction().commit();
             } catch (TimeUnavailableException e) {
                 System.out.printf("Trainer is not available: %s%n", e.getMessage());
             }
+
+            if (entityManager.getTransaction().isActive()) {
+                entityManager.getTransaction().commit();
+            }
+            entityManager.getTransaction().begin();
 
             Racket r1 = new Racket("Yonex", 100., BigDecimal.valueOf(20));
             Racket r2 = new Racket("Willson", 150., BigDecimal.valueOf(20));
@@ -123,6 +144,8 @@ public class Main {
                             LocalDateTime.now().plusDays(1).getDayOfMonth(), 12, 0),
                     Duration.ofHours(2),
                     courts[1], client2, client2);
+
+            entityManager.persist(reservation1);
 
             transaction.commit();
         } finally {
