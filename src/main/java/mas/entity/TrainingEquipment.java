@@ -1,9 +1,9 @@
 package mas.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Entity
@@ -12,9 +12,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TrainingEquipment extends Equipment {
 
-    @Column(nullable = false)
+    @NonNull
     private String name;
-    @Column(nullable = false)
+    @NonNull
     private String description;
 
     public TrainingEquipment(String name, String description) {
@@ -26,5 +26,14 @@ public class TrainingEquipment extends Equipment {
         super(notes);
         this.name = name;
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "TrainingEquipment{" +
+                "notes='" + getNotes() + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

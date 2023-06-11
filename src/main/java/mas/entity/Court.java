@@ -8,6 +8,7 @@ import mas.util.Util;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -35,16 +36,18 @@ public abstract class Court {
     }
 
     @OneToMany(mappedBy = "court")
-    private Set<Reservation> reservations;
+    private Set<Reservation> reservations = new HashSet<>();
 
     @OneToMany(mappedBy = "court")
-    private Set<Training> trainings;
+    private Set<Training> trainings = new HashSet<>();
 
     public boolean isAvailable(LocalDateTime from, Duration duration) {
+        boolean a = getReservations().stream().noneMatch(r -> Util.isOverlapping(from, duration, r.getStart(), r.getDuration()));
+        boolean b = getTrainings().stream().noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()));
+
         return getReservations().stream()
                 .noneMatch(r -> Util.isOverlapping(from, duration, r.getStart(), r.getDuration())) &&
                 getTrainings().stream()
                         .noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()));
     }
-
 }

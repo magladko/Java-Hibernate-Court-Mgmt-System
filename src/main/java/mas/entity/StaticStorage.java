@@ -31,14 +31,14 @@ public class StaticStorage {
     private LocalDate courtUnroofedSeasonEnd;
 
     public static void loadStaticValuesFromDB(Session session) {
+        // TODO: load from DB
         throw new UnsupportedOperationException("Not implemented.");
 //        session.createQuery("from StaticStorage", StaticStorage.class).getSingleResult().loadStaticValues();
     }
 
     public void loadStaticValues() {
-        throw new UnsupportedOperationException("Not implemented.");
-//        fillStaticFields(CourtRoofed.class);
-//        fillStaticFields(CourtUnroofed.class);
+        fillStaticFields(CourtRoofed.class);
+        fillStaticFields(CourtUnroofed.class);
     }
 
     private void fillStaticFields(Class<?> cls) {

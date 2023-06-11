@@ -29,4 +29,11 @@ public class CourtUnroofed extends Court {
         return !from.isAfter(seasonStart) || !from.isBefore(seasonEnd) || super.isAvailable(from, duration);
     }
 
+    @Override
+    public String toString() {
+        return "CourtUnroofed{" +
+                "number=" + getNumber() +
+                ", surfaceType=" + getSurfaceType() +
+                '}';
+    }
 }

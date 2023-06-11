@@ -58,8 +58,8 @@ public class Reservation {
         if (!participant.getPersonTypes().contains(Person.PersonType.Participant))
             throw new TypeMismatchException("Second argument person type is not Participant.");
 
-        if (court.isAvailable(start, duration))
-            throw new TimeUnavailableException(Court.class, start, duration);
+        if (!court.isAvailable(start, duration))
+            throw new TimeUnavailableException(court, start, duration);
 
         var reservation = new Reservation(start, duration, court, null, participant, client);
         reservation.getClient().getReservationsBought().add(reservation);
@@ -83,4 +83,15 @@ public class Reservation {
         // out of scope
     }
 
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "start=" + start +
+                ", duration=" + duration +
+                ", court=" + court.getNumber() +
+                ", participant=" + participant.getId() +
+                ", client=" + client.getId() +
+                ", racket=" + racket.getId() +
+                '}';
+    }
 }

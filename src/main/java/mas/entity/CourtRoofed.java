@@ -1,9 +1,10 @@
 package mas.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import mas.util.StaticallyStored;
 
@@ -22,7 +23,8 @@ public class CourtRoofed extends Court {
     @StaticallyStored private static BigDecimal heatingSeasonStart;
     @StaticallyStored private static BigDecimal heatingSeasonEnd;
 
-    @Column(nullable = false)
+    @Enumerated
+    @NonNull
     private RoofType roofType;
 
     public CourtRoofed(Integer number, SurfaceType surfaceType, RoofType roofType) {
@@ -30,4 +32,12 @@ public class CourtRoofed extends Court {
         this.roofType = roofType;
     }
 
+    @Override
+    public String toString() {
+        return "CourtRoofed{" +
+                "number=" + getNumber() +
+                ", surfaceType=" + getSurfaceType() +
+                ", roofType=" + roofType +
+                "}";
+    }
 }

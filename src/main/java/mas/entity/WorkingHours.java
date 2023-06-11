@@ -22,4 +22,12 @@ public class WorkingHours {
         this.startTime = startTime;
         this.endTime = endTime;
     }
+
+    @Override
+    public String toString() {
+        return "WorkingHours{" +
+                "startTime=" + startTime +
+                ", endTime=" + endTime +
+                '}';
+    }
 }
