@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+             version="2.2">
+    <persistence-unit name="default">
+        <class>mas.entity.Court</class>
+        <class>mas.entity.CourtRoofed</class>
+        <class>mas.entity.StaticStorage</class>
+        <class>mas.entity.CourtUnroofed</class>
+        <class>mas.entity.Equipment</class>
+        <class>mas.entity.Person</class>
+        <class>mas.entity.Racket</class>
+        <class>mas.entity.Reservation</class>
+        <class>mas.entity.Trainer</class>
+        <class>mas.entity.WorkingHours</class>
+        <class>mas.entity.CyclicalTraining</class>
+        <class>mas.entity.Training</class>
+        <class>mas.entity.TrainingEquipment</class>
+
+        <properties>
+            <property name="hibernate.connection.url" value="jdbc:h2:tcp://localhost/~/test1"/>
+            <property name="hibernate.connection.driver_class" value="org.h2.Driver"/>
+            <property name="hibernate.connection.username" value=""/>
+            <property name="hibernate.connection.password" value=""/>
+            <property name="hibernate.connection.pool_size" value="1"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.cache.use_second_level_cache" value="false"/>
+
+            <!-- TODO: Change the value after development -->
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <property name="hibernate.generate_statistics" value="true"/>
+            <property name="hibernate.show_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>
