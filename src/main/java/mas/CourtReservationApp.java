@@ -8,7 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.Getter;
-import lombok.Setter;
+import mas.entity.StaticStorage;
 import mas.util.DBController;
 
 import java.util.Objects;
@@ -16,23 +16,34 @@ import java.util.Objects;
 public class CourtReservationApp extends Application {
 
     @Getter
-    @Setter
-    private static volatile Stage primaryStage;
+    private static Stage stage;
 
     @Getter
-    @Setter
-    private static volatile Scene primaryScene;
+    private static Stage additionalStage;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-//        DBController db = DBController.INSTANCE;
+    public void start(Stage stage) throws Exception {
+        DBController db = DBController.INSTANCE;
 
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("court-reservation.fxml")));
-        primaryStage.setTitle("Court Reservation App");
-        primaryStage.setMinWidth(500);
-        primaryStage.setMinHeight(400);
-        primaryStage.setScene(new Scene(root, 600, 400));
-        primaryStage.show();
+//        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("court-reservation.fxml")));
+//        stage.setTitle("Court Reservation App");
+//        stage.setMinWidth(500);
+//        stage.setMinHeight(400);
+//
+        CourtReservationApp.stage = stage;
+        CourtReservationApp.additionalStage = new Stage();
+        CourtReservationApp.additionalStage.setOnCloseRequest(e -> {
+            CourtReservationApp.additionalStage.close();
+            CourtReservationApp.stage.show();
+        });
+
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("start.fxml")));
+        CourtReservationApp.stage.setScene(new Scene(root, 600, 400));
+        CourtReservationApp.stage.setMinWidth(500);
+        CourtReservationApp.stage.setMinHeight(400);
+        CourtReservationApp.stage.setTitle("Court reservation app");
+        CourtReservationApp.stage.show();
+
     }
 
     public static void main(String[] args) {
@@ -40,6 +51,7 @@ public class CourtReservationApp extends Application {
         DBController.INSTANCE.setEm(entityManagerFactory.createEntityManager());
         try {
 
+            // TODO: remove seeding
             DBController.INSTANCE.seedDb();
             launch(args);
 

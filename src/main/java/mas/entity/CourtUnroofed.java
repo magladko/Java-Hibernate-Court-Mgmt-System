@@ -4,10 +4,12 @@ import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import mas.util.DBController;
 import mas.util.StaticallyStored;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,9 +18,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CourtUnroofed extends Court {
 
-    @StaticallyStored private static BigDecimal pricePerHour;
-    @StaticallyStored private static LocalDateTime seasonStart;
-    @StaticallyStored private static LocalDateTime seasonEnd;
+    private static BigDecimal pricePerHour;
+    private static LocalDate seasonStart;
+    private static LocalDate seasonEnd;
 
     public CourtUnroofed(Integer number, SurfaceType surfaceType) {
         super(number, surfaceType);
@@ -26,7 +28,7 @@ public class CourtUnroofed extends Court {
 
     @Override
     public boolean isAvailable(LocalDateTime from, Duration duration) {
-        return !from.isAfter(seasonStart) || !from.isBefore(seasonEnd) || super.isAvailable(from, duration);
+        return !from.isAfter(getSeasonStart().atStartOfDay()) || !from.isBefore(getSeasonEnd().atStartOfDay()) || super.isAvailable(from, duration);
     }
 
     @Override
@@ -35,5 +37,23 @@ public class CourtUnroofed extends Court {
                 "number=" + getNumber() +
                 ", surfaceType=" + getSurfaceType() +
                 '}';
+    }
+
+    public static BigDecimal getPricePerHour() {
+        pricePerHour = DBController.INSTANCE.getEm()
+                .createQuery("select ss.courtUnroofedPricePerHour from StaticStorage ss", BigDecimal.class).getSingleResult();
+        return pricePerHour;
+    }
+
+    public static LocalDate getSeasonStart() {
+        seasonStart = DBController.INSTANCE.getEm()
+                .createQuery("select ss.courtUnroofedSeasonStart from StaticStorage ss", LocalDate.class).getSingleResult();
+        return seasonStart;
+    }
+
+    public static LocalDate getSeasonEnd() {
+        seasonEnd = DBController.INSTANCE.getEm()
+                .createQuery("select ss.courtUnroofedSeasonEnd from StaticStorage ss", LocalDate.class).getSingleResult();
+        return seasonEnd;
     }
 }

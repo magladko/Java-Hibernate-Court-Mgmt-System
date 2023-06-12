@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 @Getter
@@ -12,9 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TrainingEquipment extends Equipment {
 
-    @NonNull
     private String name;
-    @NonNull
     private String description;
 
     public TrainingEquipment(String name, String description) {

@@ -22,6 +22,8 @@ public enum DBController {
             em.getTransaction().begin();
 
             var staticStorage = new StaticStorage();
+            staticStorage.setCourtOpeningHour(LocalTime.of(9, 0));
+            staticStorage.setCourtClosingHour(LocalTime.of(21, 0));
             staticStorage.setCourtRoofedPricePerHour(BigDecimal.valueOf(100));
             staticStorage.setCourtRoofedHeatingSurcharge(BigDecimal.valueOf(30));
             staticStorage.setCourtRoofedHeatingSeasonStart(LocalDate.of(LocalDate.now().getYear(), 10, 1));

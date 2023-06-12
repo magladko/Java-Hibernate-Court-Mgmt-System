@@ -10,8 +10,5 @@
         <module name="ProjektMAS" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="ProjektMAS" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>

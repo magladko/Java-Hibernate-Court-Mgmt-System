@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import mas.util.DBController;
 import mas.util.StaticallyStored;
 import mas.util.Util;
 
@@ -21,8 +22,8 @@ public abstract class Court {
 
     public enum SurfaceType { Grass, Clay, Hard, ArtificialGrass }
 
-    @StaticallyStored private static LocalTime openingHour;
-    @StaticallyStored private static LocalTime closingHour;
+    private static LocalTime openingHour;
+    private static LocalTime closingHour;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,12 +48,22 @@ public abstract class Court {
     private Set<Training> trainings = new HashSet<>();
 
     public boolean isAvailable(LocalDateTime from, Duration duration) {
-        boolean a = getReservations().stream().noneMatch(r -> Util.isOverlapping(from, duration, r.getStart(), r.getDuration()));
-        boolean b = getTrainings().stream().noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()));
-
         return getReservations().stream()
                 .noneMatch(r -> Util.isOverlapping(from, duration, r.getStart(), r.getDuration())) &&
                 getTrainings().stream()
                         .noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()));
     }
+
+    public static LocalTime getOpeningHour() {
+        openingHour = DBController.INSTANCE.getEm()
+                .createQuery("select ss.courtOpeningHour from StaticStorage ss", LocalTime.class).getSingleResult();
+        return openingHour;
+    }
+
+    public static LocalTime getClosingHour() {
+        closingHour = DBController.INSTANCE.getEm()
+                .createQuery("select ss.courtClosingHour from StaticStorage ss", LocalTime.class).getSingleResult();
+        return closingHour;
+    }
+
 }

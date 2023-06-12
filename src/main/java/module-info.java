@@ -11,11 +11,11 @@ module ProjektMAS {
     requires jakarta.persistence;
     requires org.hibernate.orm.core;
     requires reflections;
+    requires org.jetbrains.annotations;
 
     opens mas;
     opens mas.entity;
     opens mas.gui.controllers;
     exports mas;
     exports mas.entity;
-
 }
