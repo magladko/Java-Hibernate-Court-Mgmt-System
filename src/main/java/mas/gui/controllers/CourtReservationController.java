@@ -2,6 +2,9 @@ package mas.gui.controllers;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
+import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -47,7 +50,7 @@ public class CourtReservationController {
     protected void initialize() {
         // Hour columns
         availabilityTable.setDisable(true);
-        availabilityTable.setSelectionModel(null);
+//        availabilityTable.setSelectionModel(null);
 
         datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             updateAvailabilityTable();
@@ -68,6 +71,9 @@ public class CourtReservationController {
 
         availabilityTable.setEditable(true);
 
+
+//        availabilityTable.getSelectionModel().selectedIndexProperty()
+
         courtNumberColumn.setCellValueFactory(new PropertyValueFactory<>("number"));
 
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerHour"));
@@ -84,57 +90,9 @@ public class CourtReservationController {
             hourColumn.setReorderable(false);
 
             hourColumn.setCellValueFactory(courtBooleanCellDataFeatures -> {
-                courtBooleanCellDataFeatures.getValue().getMarkedHours().add(new SimpleBooleanProperty(false));
-                return courtBooleanCellDataFeatures.getValue().getMarkedHours()
-                        .get(courtBooleanCellDataFeatures.getValue().getMarkedHours().size() - 1);
+                return courtBooleanCellDataFeatures.getValue().getMarkedHours().get(hourColumn);
             });
 
-            // NO DISABLING
-//            hourColumn.setCellFactory(column -> new CheckBoxTableCell<>() {
-//                @Override
-//                public void updateItem(Boolean item, boolean empty) {
-//                    System.out.println("UPDATE");
-//                    super.updateItem(item, empty);
-//                    if (item == null || empty) {
-//                        setText(null);
-//                        setStyle("");
-//                    } else {
-//                        var courtAvailable = column.getTableView().getItems().get(getIndex()).isAvailable(LocalTime.parse(column.getText(), DateTimeFormatter.ofPattern("HH:mm")).atDate(datePicker.getValue()), Duration.ofHours(1));
-//                        if (courtAvailable) {
-//                            setDisable(false);
-//                            // TODO: User can check only hours on one court and only adjacent hours
-//
-//                            var checkBox = new CheckBox();
-//                            checkBox.setSelected(item);
-//                            setGraphic(checkBox);
-//
-////                            checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-////                                System.out.println("CHECKED");
-////                                if (newValue) {
-////                                    // Disable other rows
-////                                    for (int i = 0; i < column.getTableView().getItems().size(); i++) {
-////                                        if (i != getIndex()) {
-////                                            column.getTableView().getItems().get(i).getDisabledTableRow().setValue(false);
-////                                        }
-////                                    }
-////                                } else {
-////                                    // Enable all rows
-////                                    for (int i = 0; i < column.getTableView().getItems().size(); i++) {
-////                                        column.getTableView().getItems().get(i).getDisabledTableRow().setValue(false);
-////                                    }
-////                                }
-////                            });
-//
-//                            setStyle("");
-//                        } else {
-//                            setDisable(true);
-//                            setStyle("-fx-background-color: #ffb4b4;"+ "-fx-opacity: 0.4;");
-//                        }
-//                    }
-//                }
-//            });
-
-            // DISABLES, NO GRAPHICAL EFFECTS
             hourColumn.setCellFactory(column -> new CheckBoxTableCell<>() {
                 @Override
                 public void updateItem(Boolean item, boolean empty) {
@@ -146,15 +104,14 @@ public class CourtReservationController {
                         var courtAvailable = column.getTableView().getItems().get(getIndex()).isAvailable(LocalTime.parse(column.getText(), DateTimeFormatter.ofPattern("HH:mm")).atDate(datePicker.getValue()), Duration.ofHours(1));
                         if (courtAvailable) {
                             setDisable(false);
-                            // TODO: User can check only hours on one court and only adjacent hours
 
                             var checkBox = new CheckBox();
                             checkBox.setSelected(item);
                             setGraphic(checkBox);
 
                             checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                                System.out.println("CHECKED");
                                 if (newValue) {
+                                    column.getTableView().getItems().get(getIndex()).getMarkedHours().get(column).setValue(true);
                                     // Disable other rows
                                     for (int i = 0; i < column.getTableView().getItems().size(); i++) {
                                         if (i != getIndex()) {
@@ -163,8 +120,11 @@ public class CourtReservationController {
                                     }
                                 } else {
                                     // Enable all rows
-                                    for (int i = 0; i < column.getTableView().getItems().size(); i++) {
-                                        column.getTableView().getItems().get(i).getDisabledTableRow().setValue(false);
+                                    column.getTableView().getItems().get(getIndex()).getMarkedHours().get(column).setValue(false);
+                                    if (column.getTableView().getItems().get(getIndex()).getMarkedHours().values().stream().noneMatch(ObservableBooleanValue::get)) {
+                                        for (int i = 0; i < column.getTableView().getItems().size(); i++) {
+                                            column.getTableView().getItems().get(i).getDisabledTableRow().setValue(false);
+                                        }
                                     }
                                 }
                             });
@@ -172,7 +132,7 @@ public class CourtReservationController {
                             // Bind the disable and opacity properties to the disabledTableRow property of the Court
                             var disabledTableRow = column.getTableView().getItems().get(getIndex()).getDisabledTableRow();
                             checkBox.disableProperty().bind(disabledTableRow);
-                            setOpacity(disabledTableRow.getValue() ? 0.4 : 1.0);
+                            disabledTableRow.addListener(observable -> setOpacity(disabledTableRow.getValue() ? 0.4 : 1.0));
 
                             setStyle("");
                         } else {
@@ -183,101 +143,6 @@ public class CourtReservationController {
                 }
             });
 
-
-            // ALMOST AS INTENDED
-            hourColumn.setCellFactory(column -> new TableCell<>() {
-                private final CheckBox checkBox = new CheckBox();
-
-                {
-                    checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                        System.out.println("CHECKED");
-                        if (newValue) {
-                            // Disable other rows
-                            for (int i = 0; i < column.getTableView().getItems().size(); i++) {
-                                if (i != getIndex()) {
-                                    column.getTableView().getItems().get(i).getDisabledTableRow().setValue(true);
-                                }
-                            }
-                        } else {
-                            // Enable all rows
-                            for (int i = 0; i < column.getTableView().getItems().size(); i++) {
-                                column.getTableView().getItems().get(i).getDisabledTableRow().setValue(false);
-                            }
-                        }
-                    });
-                }
-
-                @Override
-                protected void updateItem(Boolean item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setGraphic(null);
-                        setText(null);
-                    } else {
-                        var courtAvailable = column.getTableView().getItems().get(getIndex()).isAvailable(LocalTime.parse(column.getText(), DateTimeFormatter.ofPattern("HH:mm")).atDate(datePicker.getValue()), Duration.ofHours(1));
-                        if (courtAvailable) {
-                            setGraphic(checkBox);
-                            checkBox.setSelected(item);
-
-                            // Bind the disableProperty() of the checkbox to the disabledTableRow property of the Court
-                            var disabledTableRow = column.getTableView().getItems().get(getIndex()).getDisabledTableRow();
-                            checkBox.disableProperty().bind(disabledTableRow);
-                            setOpacity(disabledTableRow.getValue() ? 0.4 : 1.0);
-
-                            setText(null);
-                        } else {
-                            setGraphic(null);
-                            setText(null);
-                            setDisable(true);
-                            setStyle("-fx-background-color: #ffb4b4;");
-                        }
-                    }
-                }
-            });
-
-
-            // THROWS SOME ERRORS
-//            hourColumn.setCellFactory(column -> new CheckBoxTableCell<>() {
-//                @Override
-//                public void updateItem(Boolean item, boolean empty) {
-//                    super.updateItem(item, empty);
-//                    if (empty || item == null) {
-//                        setText(null);
-//                    } else {
-//                        var courtAvailable = column.getTableView().getItems().get(getIndex()).isAvailable(LocalTime.parse(column.getText(), DateTimeFormatter.ofPattern("HH:mm")).atDate(datePicker.getValue()), Duration.ofHours(1));
-//                        if (courtAvailable) {
-//                            setDisable(false);
-//                            // TODO: User can check only hours on one court and only adjacent hours
-//                            setStyle("");
-//
-//                            // Bind the disableProperty() of the checkbox to the disabledTableRow property of the Court
-//                            var disabledTableRow = column.getTableView().getItems().get(getIndex()).getDisabledTableRow();
-//                            disableProperty().bind(disabledTableRow);
-//                            setOpacity(disabledTableRow.getValue() ? 0.4 : 1.0);
-//                        } else {
-//                            setDisable(true);
-//                            setStyle("-fx-background-color: #ffb4b4;");
-//                        }
-//                    }
-//                }
-//            });
-//
-//            availabilityTable.setRowFactory(column -> new TableRow<>() {
-//                @Override
-//                public void updateItem(Court item, boolean empty) {
-//                    super.updateItem(item, empty);
-//                    if (empty || item == null) {
-//                        setStyle("");
-//                    } else {
-//                        var disabledTableRow = item.getDisabledTableRow();
-//                        setOpacity(disabledTableRow.getValue() ? 0.4 : 1.0);
-//                    }
-//                }
-//            });
-
-
-
-
             hourColumns.add(hourColumn);
             availabilityTable.getColumns().add(hourColumn);
         }
@@ -287,6 +152,28 @@ public class CourtReservationController {
                 TableRow<Court> row = new TableRow<>();
 //                row.disableProperty().bindBidirectional(tableView.getItems().get(tableView.getSelectionModel().getSelectedIndex()).getDisabledTableRow());
                 row.disableProperty().bindBidirectional(tableView.getItems().get(row.getIndex()).getDisabledTableRow());
+                tableView.getItems().get(row.getIndex()).getDisabledTableRow().addListener((observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        tableView.getSelectionModel().select(row.getIndex());
+                        System.out.println("SELECTED!");
+                        // TODO: not working
+                    }
+                });
+//                row.getItem().getMarkedHours().addListener((MapChangeListener<? super TableColumn<Court, Boolean>, ? super BooleanProperty>) change -> {
+//                    // Update the selected state of the row
+//                    row.setSelected(row.getItem().getMarkedHours().stream().anyMatch(BooleanProperty::get));
+//                    row.getTableView().getSelectionModel().
+//                });
+
+//                // Add a listener to the selected state of the row
+//                row.selectedProperty().addListener((observable, oldValue, newValue) -> {
+//                    // If the row is being selected, clear the selection of other rows
+//                    if (newValue) {
+//                        tableView.getSelectionModel().clearSelection();
+//                        row.setSelected(true);
+//                    }
+//                });
+
                 return row;
             });
         });
@@ -302,6 +189,12 @@ public class CourtReservationController {
 
         availabilityTable.getItems().addAll(
                 DBController.INSTANCE.getEm().createQuery("from Court", Court.class).getResultList());
+
+
+        availabilityTable.getItems().forEach(c -> {
+            c.getMarkedHours().clear();
+            hourColumns.forEach(col -> c.getMarkedHours().put(col, new SimpleBooleanProperty(false)));
+        });
 
         availabilityTable.setDisable(false);
     }
