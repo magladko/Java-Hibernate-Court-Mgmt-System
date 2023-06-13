@@ -74,6 +74,19 @@ public abstract class Court {
         return closingHour;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Court court)) return false;
+
+        return getNumber().equals(court.getNumber());
+    }
+
+    @Override
+    public int hashCode() {
+        return getNumber().hashCode();
+    }
+
     @Transient
     @Getter
     private ObservableMap<TableColumn<Court, Boolean>, BooleanProperty> markedHours = FXCollections.observableHashMap();

@@ -135,4 +135,24 @@ public class Training {
                 ", court=" + court.getNumber() +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Training training)) return false;
+
+        if (!getStart().equals(training.getStart())) return false;
+        if (!getDuration().equals(training.getDuration())) return false;
+        if (!getTrainer().equals(training.getTrainer())) return false;
+        return getCourt().equals(training.getCourt());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getStart().hashCode();
+        result = 31 * result + getDuration().hashCode();
+        result = 31 * result + getTrainer().hashCode();
+        result = 31 * result + getCourt().hashCode();
+        return result;
+    }
 }

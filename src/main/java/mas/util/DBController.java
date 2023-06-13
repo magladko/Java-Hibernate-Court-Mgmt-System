@@ -61,9 +61,11 @@ public enum DBController {
                                                              LocalDate.of(2004, 10, 10),
                                                              client1
             );
+            Person participant3 = Person.registerParticipant("Jerzy", "Kowalski", client2);
 
             em.persist(participant1);
             em.persist(participant2);
+            em.persist(participant3);
 
             Trainer trainer1 = new Trainer("Jędrzej", "Kasztan", "423456789", "f@f.pl",
                                            Trainer.TrainerQualification.Animator, BigDecimal.valueOf(80),

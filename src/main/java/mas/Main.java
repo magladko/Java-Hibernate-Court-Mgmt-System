@@ -18,16 +18,18 @@ public class Main {
             DBController.INSTANCE.setEm(entityManager);
             DBController.INSTANCE.seedDb();
 
-            Court c2 = DBController.INSTANCE.getEm().find(Court.class, 2);
-            System.out.println(" - " + c2);
-            System.out.println(" - " + c2.getReservations());
 
-            Reservation r = DBController.INSTANCE.getEm().find(Reservation.class, 1);
-            System.out.println(" - " + r);
-            System.out.println(" - " + r.getCourt());
 
-            System.out.println(" - " + c2);
-            System.out.println(" - " + c2.getReservations());
+//            Court c2 = DBController.INSTANCE.getEm().find(Court.class, 2);
+//            System.out.println(" - " + c2);
+//            System.out.println(" - " + c2.getReservations());
+//
+//            Reservation r = DBController.INSTANCE.getEm().find(Reservation.class, 1);
+//            System.out.println(" - " + r);
+//            System.out.println(" - " + r.getCourt());
+//
+//            System.out.println(" - " + c2);
+//            System.out.println(" - " + c2.getReservations());
 
         } finally {
             if (transaction.isActive()) {

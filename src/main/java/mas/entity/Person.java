@@ -202,4 +202,35 @@ public class Person {
         }
         throw new TypeMismatchException("Person is not a Client or Participant");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person person)) return false;
+
+        if (!getPersonTypes().equals(person.getPersonTypes())) return false;
+        if (getPersonTypes().contains(PersonType.Client)) {
+            // Client
+            if (!getPhoneNr().equals(person.getPhoneNr())) return false;
+        }
+
+        if (getPersonTypes().contains(PersonType.Participant)) {
+            // Participant
+            if (!getName().equals(person.getName())) return false;
+            if (!getSurname().equals(person.getSurname())) return false;
+            return getOwningClient() != null ? getOwningClient().equals(person.getOwningClient()) : person.getOwningClient() == null;
+        }
+
+        throw new TypeMismatchException("Person is not a Client nor Participant");
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getPersonTypes().hashCode();
+        result = 31 * result + getName().hashCode();
+        result = 31 * result + getSurname().hashCode();
+        result = 31 * result + (getPhoneNr() != null ? getPhoneNr().hashCode() : 0);
+        result = 31 * result + (getOwningClient() != null ? getOwningClient().hashCode() : 0);
+        return result;
+    }
 }

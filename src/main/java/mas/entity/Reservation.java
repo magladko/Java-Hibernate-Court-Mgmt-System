@@ -105,4 +105,26 @@ public class Reservation {
                 ", racket=" + Optional.ofNullable(racket).map(Racket::getId).map(Object::toString).orElse("null") +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Reservation that)) return false;
+
+        if (!getStart().equals(that.getStart())) return false;
+        if (!getDuration().equals(that.getDuration())) return false;
+        if (!getCourt().equals(that.getCourt())) return false;
+        if (!getParticipant().equals(that.getParticipant())) return false;
+        return getClient().equals(that.getClient());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getStart().hashCode();
+        result = 31 * result + getDuration().hashCode();
+        result = 31 * result + getCourt().hashCode();
+        result = 31 * result + getParticipant().hashCode();
+        result = 31 * result + getClient().hashCode();
+        return result;
+    }
 }

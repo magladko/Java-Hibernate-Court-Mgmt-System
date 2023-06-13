@@ -50,48 +50,4 @@ public class StaticStorage {
         throw new UnsupportedOperationException("Not implemented.");
 //        session.createQuery("from StaticStorage", StaticStorage.class).getSingleResult().loadStaticValues();
     }
-
-//    public void loadStaticValues() {
-//        fillStaticFields();
-////        fillStaticFields(CourtRoofed.class);
-////        fillStaticFields(CourtUnroofed.class);
-//    }
-
-//    private void fillStaticFields() {
-//        Reflections reflections = new Reflections("mas.entity");
-//        Set<Field> fields = reflections.getFieldsAnnotatedWith(StaticallyStored.class);
-//
-//        (new Reflections("mas.entity")).getFieldsAnnotatedWith(StaticallyStored.class).forEach(f -> {
-//            try {
-//                f.setAccessible(true);
-//                char[] clazz = CourtRoofed.class.getSimpleName().toCharArray();
-//                clazz[0] = Character.toLowerCase(clazz[0]);
-//                char[] filed = f.getName().toCharArray();
-//                filed[0] = Character.toUpperCase(clazz[0]);
-//                f.set(null, this.getClass().getField(new String(clazz) + new String(filed)));
-//            } catch (IllegalAccessException | NoSuchFieldException e) {
-//                throw new RuntimeException(e);
-//            } finally {
-//                f.setAccessible(false);
-//            }
-//        });
-//
-////        Arrays.stream(cls.getDeclaredFields()).filter(f -> f.isAnnotationPresent(StaticallyStored.class))
-////                .forEach(f -> {
-////                    if (f.isAnnotationPresent(StaticallyStored.class)) {
-////                        try {
-////                            f.setAccessible(true);
-////                            char[] clazz = CourtRoofed.class.getSimpleName().toCharArray();
-////                            clazz[0] = Character.toLowerCase(clazz[0]);
-////                            char[] filed = f.getName().toCharArray();
-////                            filed[0] = Character.toUpperCase(clazz[0]);
-////                            f.set(null, this.getClass().getField(new String(clazz) + new String(filed)));
-////                        } catch (IllegalAccessException | NoSuchFieldException e) {
-////                            throw new RuntimeException(e);
-////                        } finally {
-////                            f.setAccessible(false);
-////                        }
-////                    }
-////                });
-//    }
 }

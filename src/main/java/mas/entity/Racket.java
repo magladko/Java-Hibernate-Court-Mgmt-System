@@ -67,4 +67,24 @@ public class Racket extends Equipment {
                 ", pricePerHour=" + pricePerHour +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Racket racket)) return false;
+        if (!super.equals(o)) return false;
+
+        if (!getManufacturer().equals(racket.getManufacturer())) return false;
+        if (!getWeight().equals(racket.getWeight())) return false;
+        return getPricePerHour().equals(racket.getPricePerHour());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + getManufacturer().hashCode();
+        result = 31 * result + getWeight().hashCode();
+        result = 31 * result + getPricePerHour().hashCode();
+        return result;
+    }
 }

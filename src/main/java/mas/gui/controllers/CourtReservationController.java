@@ -43,14 +43,11 @@ public class CourtReservationController {
     @Getter
     private Reservation tempReservationDTO;
 
-
-    private Map<CheckBoxTableCell<Court, Boolean>, BooleanProperty> checkedCells = new HashMap<>();
-
     @FXML
     protected void initialize() {
         // Hour columns
         availabilityTable.setDisable(true);
-//        availabilityTable.setSelectionModel(null);
+        availabilityTable.setSelectionModel(null);
 
         datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             updateAvailabilityTable();
@@ -70,9 +67,6 @@ public class CourtReservationController {
         availabilityTable.getItems().clear();
 
         availabilityTable.setEditable(true);
-
-
-//        availabilityTable.getSelectionModel().selectedIndexProperty()
 
         courtNumberColumn.setCellValueFactory(new PropertyValueFactory<>("number"));
 
@@ -137,7 +131,7 @@ public class CourtReservationController {
                             setStyle("");
                         } else {
                             setDisable(true);
-                            setStyle("-fx-background-color: #ffb4b4;"+ "-fx-opacity: 0.4;");
+                            setStyle("-fx-background-color: #ffb4b4;" + "-fx-opacity: 0.4;");
                         }
                     }
                 }
@@ -150,42 +144,10 @@ public class CourtReservationController {
         availabilityTable.itemsProperty().addListener((obs, oldItems, newItems) -> {
             availabilityTable.setRowFactory(tableView -> {
                 TableRow<Court> row = new TableRow<>();
-//                row.disableProperty().bindBidirectional(tableView.getItems().get(tableView.getSelectionModel().getSelectedIndex()).getDisabledTableRow());
                 row.disableProperty().bindBidirectional(tableView.getItems().get(row.getIndex()).getDisabledTableRow());
-                tableView.getItems().get(row.getIndex()).getDisabledTableRow().addListener((observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        tableView.getSelectionModel().select(row.getIndex());
-                        System.out.println("SELECTED!");
-                        // TODO: not working
-                    }
-                });
-//                row.getItem().getMarkedHours().addListener((MapChangeListener<? super TableColumn<Court, Boolean>, ? super BooleanProperty>) change -> {
-//                    // Update the selected state of the row
-//                    row.setSelected(row.getItem().getMarkedHours().stream().anyMatch(BooleanProperty::get));
-//                    row.getTableView().getSelectionModel().
-//                });
-
-//                // Add a listener to the selected state of the row
-//                row.selectedProperty().addListener((observable, oldValue, newValue) -> {
-//                    // If the row is being selected, clear the selection of other rows
-//                    if (newValue) {
-//                        tableView.getSelectionModel().clearSelection();
-//                        row.setSelected(true);
-//                    }
-//                });
-
                 return row;
             });
         });
-
-
-//        availabilityTable.setRowFactory(tableView -> {
-//            TableRow<Court> row = new TableRow<>();
-////            row.disableProperty().bindBidirectional(tableView.getItems().get(row.getIndex()).getDisabledTableRow());
-//            row.disableProperty().bindBidirectional(tableView
-//                    .getItems().get(tableView.getSelectionModel().getSelectedIndex()).getDisabledTableRow());
-//            return row;
-//        });
 
         availabilityTable.getItems().addAll(
                 DBController.INSTANCE.getEm().createQuery("from Court", Court.class).getResultList());
@@ -198,8 +160,4 @@ public class CourtReservationController {
 
         availabilityTable.setDisable(false);
     }
-
-    // Define your event handlers and other methods
-
-    // Define your CourtAvailability class (used by TableView)
 }
