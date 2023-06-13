@@ -8,6 +8,7 @@ import mas.entity.*;
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public enum DBController {
@@ -167,4 +168,11 @@ public enum DBController {
         }
     }
 
+    public List<Trainer> getTrainers() {
+        return INSTANCE.getEm().createQuery("SELECT t FROM Trainer t", Trainer.class).getResultList();
+    }
+
+    public List<Court> getCourts() {
+        return INSTANCE.getEm().createQuery("SELECT c FROM Court c", Court.class).getResultList();
+    }
 }

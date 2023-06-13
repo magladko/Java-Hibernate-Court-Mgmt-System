@@ -22,7 +22,18 @@ import java.util.Set;
 public class Trainer {
 
     public enum TrainerQualification {
-        Animator, Instructor, Trainer, TrainerBasicTraining, TrainerPerformanceTraining, TrainerCoach
+        Animator("Animator"), Instructor("Instruktor"), TrainerCoach("Trener Coach");
+
+        private final String polishName;
+
+        TrainerQualification(String polishName) {
+            this.polishName = polishName;
+        }
+
+        @Override
+        public String toString() {
+            return polishName;
+        }
     }
 
     @Id

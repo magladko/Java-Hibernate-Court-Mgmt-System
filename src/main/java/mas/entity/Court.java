@@ -54,8 +54,6 @@ public abstract class Court {
     private Set<Training> trainings = new HashSet<>();
 
     public boolean isAvailable(LocalDateTime from, Duration duration) {
-        System.out.println(this + ": " + getTrainings().stream()
-                .noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()))+ ": "+ from + duration + getTrainings());
         return getReservations().stream()
                 .noneMatch(r -> Util.isOverlapping(from, duration, r.getStart(), r.getDuration())) &&
                 getTrainings().stream()

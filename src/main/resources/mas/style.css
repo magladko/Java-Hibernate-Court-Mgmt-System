@@ -2,3 +2,7 @@
     -fx-font-size: 36px;
     -fx-font-weight: BOLD;
 }
+
+.trainer-label {
+    -fx-text-fill: #036500;
+}

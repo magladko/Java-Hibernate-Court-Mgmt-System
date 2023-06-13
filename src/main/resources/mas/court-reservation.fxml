@@ -7,9 +7,9 @@
 
 <GridPane alignment="CENTER" hgap="10.0" vgap="10.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.CourtReservationController">
     <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
     </columnConstraints>
     <rowConstraints>
         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
@@ -29,8 +29,9 @@
     <!-- Filters -->
     <!-- Place your filter components here -->
     <Label text="Tabela dostępności kortów" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-    <Label text="trener: " GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-    <Label text="Imię Nazwisko, stopień trenerski, CENA" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+    <Label fx:id="trainerMiscLabel" text="trener: " visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+<!--    <Label fx:id="trainerLabel" minHeight="-Infinity" minWidth="-Infinity" styleClass="trainer-label" stylesheets="@style.css" text="Imię Nazwisko, stopień trenerski, CENA" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />-->
+    
     <TableView fx:id="availabilityTable" minHeight="-Infinity" prefHeight="200.0" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
         <columns>
             <TableColumn fx:id="courtNumberColumn" editable="false" prefWidth="-1.0" reorderable="false" text="Numer kortu" />
@@ -53,9 +54,10 @@
         <Label text="Total Price:" />
         <Label fx:id="totalPriceLabel" text="" />
     </HBox>
-    <Button mnemonicParsing="false" onAction="#showReservationSummary" text="Podsumowanie" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+    <Button fx:id="confirmButton" mnemonicParsing="false" onAction="#showReservationSummary" text="Podsumowanie" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
     <TextArea fx:id="commentsTextArea" prefHeight="100.0" prefWidth="572.0" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
    <Label text="*filters*" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+   <Label fx:id="trainerLabel" styleClass="trainer-label" stylesheets="@style.css" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="2" />
 
     <stylesheets>
         <URL value="@style.css" />
