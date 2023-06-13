@@ -7,8 +7,10 @@ import lombok.Setter;
 import mas.util.TimeUnavailableException;
 import org.hibernate.TypeMismatchException;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -63,8 +65,9 @@ public class Reservation {
 
         var reservation = new Reservation(start, duration, court, null, participant, client);
 
-        reservation.getClient().getReservationsBought().add(reservation);
-        reservation.getParticipant().getReservations().add(reservation);
+        court.getReservations().add(reservation);
+        client.getReservationsBought().add(reservation);
+        participant.getReservations().add(reservation);
 
         if (racket != null) {
             reservation.setRacket(racket);
@@ -78,8 +81,9 @@ public class Reservation {
         return makeReservation(start, duration, court, null, client, participant);
     }
 
-    public void getTotalPrice() {
+    public BigDecimal getTotalPrice() {
         // TODO: getting total price of reservation
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     public void pay() {
@@ -98,7 +102,7 @@ public class Reservation {
                 ", court=" + court.getNumber() +
                 ", participant=" + participant.getId() +
                 ", client=" + client.getId() +
-                ", racket=" + racket.getId() +
+                ", racket=" + Optional.ofNullable(racket).map(Racket::getId).map(Object::toString).orElse("null") +
                 '}';
     }
 }

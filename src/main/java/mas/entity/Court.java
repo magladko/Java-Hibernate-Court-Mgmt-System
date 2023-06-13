@@ -1,17 +1,20 @@
 package mas.entity;
 
 import jakarta.persistence.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import mas.util.DBController;
-import mas.util.StaticallyStored;
 import mas.util.Util;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -48,6 +51,8 @@ public abstract class Court {
     private Set<Training> trainings = new HashSet<>();
 
     public boolean isAvailable(LocalDateTime from, Duration duration) {
+        System.out.println(this + ": " + getTrainings().stream()
+                .noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()))+ ": "+ from + duration + getTrainings());
         return getReservations().stream()
                 .noneMatch(r -> Util.isOverlapping(from, duration, r.getStart(), r.getDuration())) &&
                 getTrainings().stream()
@@ -65,5 +70,13 @@ public abstract class Court {
                 .createQuery("select ss.courtClosingHour from StaticStorage ss", LocalTime.class).getSingleResult();
         return closingHour;
     }
+
+    @Transient
+    @Getter
+    private List<BooleanProperty> markedHours = FXCollections.observableArrayList();
+
+    @Transient
+    @Getter
+    private BooleanProperty disabledTableRow = new SimpleBooleanProperty(false);
 
 }
