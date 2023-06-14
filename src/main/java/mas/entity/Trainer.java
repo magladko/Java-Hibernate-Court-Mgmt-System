@@ -45,10 +45,8 @@ public class Trainer {
     private String name;
     @Column(nullable = false)
     private String surname;
-
     @Column(nullable = false, unique = true)
     private String phoneNr;
-
     @Column(nullable = false, unique = true)
     private String email;
 

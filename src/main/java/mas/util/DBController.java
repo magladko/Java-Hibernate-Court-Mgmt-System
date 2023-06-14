@@ -189,4 +189,8 @@ public enum DBController {
     public List<Court> getCourts() {
         return INSTANCE.getEm().createQuery("SELECT c FROM Court c", Court.class).getResultList();
     }
+
+    public StaticStorage getStaticStorage() {
+        return INSTANCE.getEm().createQuery("SELECT s FROM StaticStorage s", StaticStorage.class).getSingleResult();
+    }
 }

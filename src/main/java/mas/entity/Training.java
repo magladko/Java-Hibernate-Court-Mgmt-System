@@ -7,6 +7,7 @@ import lombok.Setter;
 import mas.util.TimeUnavailableException;
 import org.hibernate.TypeMismatchException;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -96,14 +97,8 @@ public class Training {
         throw new UnsupportedOperationException("Not implemented (out of scope)");
     }
 
-    public static List<Training> bought(Person client) {
-        // out of scope
-        throw new UnsupportedOperationException("Not implemented (out of scope)");
-    }
-
-    public boolean reserveFromOffer(Person client, Person participant) {
-        // out of scope
-        throw new UnsupportedOperationException("Not implemented (out of scope)");
+    public BigDecimal getPricePerParticipantPerTraining() {
+        throw new UnsupportedOperationException("out of project's scope");
     }
 
     @Override

@@ -8,6 +8,7 @@ import javafx.collections.ObservableMap;
 import javafx.scene.control.TableColumn;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import mas.util.DBController;
 import mas.util.Util;
@@ -27,9 +28,6 @@ import java.util.stream.IntStream;
 public abstract class Court {
 
     public enum SurfaceType { Grass, Clay, Hard, ArtificialGrass }
-
-//    private static LocalTime openingHour;
-//    private static LocalTime closingHour;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

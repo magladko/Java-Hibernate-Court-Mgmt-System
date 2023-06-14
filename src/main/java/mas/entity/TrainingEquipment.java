@@ -3,9 +3,9 @@ package mas.entity;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
+
+import java.math.BigDecimal;
 
 @Entity
 @Getter

@@ -4,15 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import mas.util.StaticallyStored;
-import org.hibernate.Session;
-import org.jboss.errai.reflections.Reflections;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -45,9 +40,4 @@ public class StaticStorage {
     @Column(unique = true)
     private LocalDate courtUnroofedSeasonEnd;
 
-    public static void loadStaticValuesFromDB(Session session) {
-        // TODO: load from DB
-        throw new UnsupportedOperationException("Not implemented.");
-//        session.createQuery("from StaticStorage", StaticStorage.class).getSingleResult().loadStaticValues();
-    }
 }

@@ -2,18 +2,13 @@ package mas.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import mas.util.DBController;
-import mas.util.StaticallyStored;
-import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -22,14 +17,6 @@ import java.time.LocalTime;
 public class CourtRoofed extends Court {
 
     public enum RoofType { Hall, Balloon }
-
-//    private static BigDecimal pricePerHour;
-//    private static BigDecimal heatingSurcharge;
-//    private static LocalDate heatingSeasonStart;
-//    private static LocalDate heatingSeasonEnd;
-
-    @ManyToOne
-    private StaticStorage storage;
 
     @Enumerated
     private RoofType roofType;

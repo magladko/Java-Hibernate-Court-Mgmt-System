@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import mas.util.DBController;
-import mas.util.StaticallyStored;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -17,10 +16,6 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class CourtUnroofed extends Court {
-
-    private static BigDecimal pricePerHour;
-    private static LocalDate seasonStart;
-    private static LocalDate seasonEnd;
 
     public CourtUnroofed(Integer number, SurfaceType surfaceType) {
         super(number, surfaceType);
@@ -42,20 +37,17 @@ public class CourtUnroofed extends Court {
     }
 
     public static BigDecimal getPricePerHour() {
-        pricePerHour = DBController.INSTANCE.getEm()
+        return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtUnroofedPricePerHour from StaticStorage ss", BigDecimal.class).getSingleResult();
-        return pricePerHour;
     }
 
     public static LocalDate getSeasonStart() {
-        seasonStart = DBController.INSTANCE.getEm()
+        return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtUnroofedSeasonStart from StaticStorage ss", LocalDate.class).getSingleResult();
-        return seasonStart;
     }
 
     public static LocalDate getSeasonEnd() {
-        seasonEnd = DBController.INSTANCE.getEm()
+        return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtUnroofedSeasonEnd from StaticStorage ss", LocalDate.class).getSingleResult();
-        return seasonEnd;
     }
 }
