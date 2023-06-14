@@ -2,6 +2,7 @@ package mas.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -22,10 +23,13 @@ public class CourtRoofed extends Court {
 
     public enum RoofType { Hall, Balloon }
 
-    private static BigDecimal pricePerHour;
-    private static BigDecimal heatingSurcharge;
-    private static LocalDate heatingSeasonStart;
-    private static LocalDate heatingSeasonEnd;
+//    private static BigDecimal pricePerHour;
+//    private static BigDecimal heatingSurcharge;
+//    private static LocalDate heatingSeasonStart;
+//    private static LocalDate heatingSeasonEnd;
+
+    @ManyToOne
+    private StaticStorage storage;
 
     @Enumerated
     private RoofType roofType;
@@ -45,27 +49,27 @@ public class CourtRoofed extends Court {
     }
 
     public static BigDecimal getPricePerHour() {
-        pricePerHour = DBController.INSTANCE.getEm()
+        return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtRoofedPricePerHour from StaticStorage ss", BigDecimal.class).getSingleResult();
-        return pricePerHour;
+//        return pricePerHour;
     }
 
     public static BigDecimal getHeatingSurcharge() {
-        heatingSurcharge = DBController.INSTANCE.getEm()
+        return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtRoofedHeatingSurcharge from StaticStorage ss", BigDecimal.class).getSingleResult();
-        return heatingSurcharge;
+//        return heatingSurcharge;
     }
 
     public static LocalDate getHeatingSeasonStart() {
-        heatingSeasonStart = DBController.INSTANCE.getEm()
+        return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtRoofedHeatingSeasonStart from StaticStorage ss", LocalDate.class).getSingleResult();
-        return heatingSeasonStart;
+//        return heatingSeasonStart;
     }
 
     public static LocalDate getHeatingSeasonEnd() {
-        heatingSeasonEnd = DBController.INSTANCE.getEm()
+        return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtRoofedHeatingSeasonEnd from StaticStorage ss", LocalDate.class).getSingleResult();
-        return heatingSeasonEnd;
+//        return heatingSeasonEnd;
     }
 
 }

@@ -100,7 +100,7 @@ public class CourtReservationController {
     private void datePickerSetup() {
         datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                if (DBController.INSTANCE.getEm().createQuery("from Court", Court.class).getResultList().stream().noneMatch(c -> c.anyAvailable(newValue))) {
+                if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(newValue))) {
                     datePicker.setValue(oldValue);
 
                     datePicker.setOnHidden(event -> datePicker.show());
@@ -125,7 +125,7 @@ public class CourtReservationController {
                     setDisable(true);
                     getStyleClass().add("past-date");
 
-                } else if (DBController.INSTANCE.getEm().createQuery("from Court", Court.class).getResultList().stream().noneMatch(c -> c.anyAvailable(date))) {
+                } else if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(date))) {
                     setOnMouseEntered(event -> Tooltip.install(this, datePickerCloudTooltip));
                     setOnMouseExited(event -> Tooltip.uninstall(this, datePickerCloudTooltip));
 //                    setDisable(true);

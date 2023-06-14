@@ -15,3 +15,7 @@
     -fx-background-color: #ffb4b4;
     -fx-opacity: 0.4;
 }
+
+.number-column, .price-column {
+    -fx-alignment: center;
+}

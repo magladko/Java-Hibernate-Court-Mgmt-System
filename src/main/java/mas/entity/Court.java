@@ -17,11 +17,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 
 @Entity
 @Getter
@@ -31,8 +28,8 @@ public abstract class Court {
 
     public enum SurfaceType { Grass, Clay, Hard, ArtificialGrass }
 
-    private static LocalTime openingHour;
-    private static LocalTime closingHour;
+//    private static LocalTime openingHour;
+//    private static LocalTime closingHour;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -69,15 +66,15 @@ public abstract class Court {
     }
 
     public static LocalTime getOpeningHour() {
-        openingHour = DBController.INSTANCE.getEm()
+        return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtOpeningHour from StaticStorage ss", LocalTime.class).getSingleResult();
-        return openingHour;
+//        return openingHour;
     }
 
     public static LocalTime getClosingHour() {
-        closingHour = DBController.INSTANCE.getEm()
+        return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtClosingHour from StaticStorage ss", LocalTime.class).getSingleResult();
-        return closingHour;
+//        return closingHour;
     }
 
     @Override
