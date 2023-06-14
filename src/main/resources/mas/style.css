@@ -6,3 +6,12 @@
 .trainer-label {
     -fx-text-fill: #036500;
 }
+
+.past-date {
+    -fx-background-color: #cccccc;
+}
+
+.datepicker-no-court-available, .unavailable-hour {
+    -fx-background-color: #ffb4b4;
+    -fx-opacity: 0.4;
+}

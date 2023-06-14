@@ -33,7 +33,7 @@ public enum DBController {
 
             staticStorage.setCourtUnroofedPricePerHour(BigDecimal.valueOf(80));
             staticStorage.setCourtUnroofedSeasonStart(LocalDate.of(LocalDate.now().getYear(), 5, 1));
-            staticStorage.setCourtUnroofedSeasonEnd(staticStorage.getCourtRoofedHeatingSeasonStart().plusMonths(4));
+            staticStorage.setCourtUnroofedSeasonEnd(staticStorage.getCourtUnroofedSeasonStart().plusMonths(4));
 
             em.persist(staticStorage);
 
@@ -159,6 +159,20 @@ public enum DBController {
             );
 
             em.persist(reservation1);
+
+            // Fully booked day
+            LocalDate fullyBookedDay = LocalDate.now().plusDays(2);
+            Arrays.stream(courts).forEach(c -> {
+                try {
+                    em.persist(Reservation
+                            .makeReservation(fullyBookedDay
+                                            .atTime(staticStorage.getCourtOpeningHour()),
+                                    Duration.between(staticStorage.getCourtOpeningHour(), staticStorage.getCourtClosingHour()),
+                                    c, client3, client3));
+                } catch (TimeUnavailableException e) {
+                    System.err.println(e.getMessage());
+                }
+            });
 
             em.getTransaction().commit();
         } finally {

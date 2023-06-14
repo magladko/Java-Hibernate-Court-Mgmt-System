@@ -18,4 +18,5 @@ module ProjektMAS {
     opens mas.gui.controllers;
     exports mas;
     exports mas.entity;
+    exports mas.util;
 }

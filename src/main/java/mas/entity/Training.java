@@ -26,8 +26,12 @@ public class Training {
 
     @Column(nullable = false)
     private LocalDateTime start;
+
     @Column(nullable = false)
     private Duration duration;
+
+    @Column(nullable = false)
+    private Boolean isPaid;
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -55,36 +59,19 @@ public class Training {
         this.duration = duration;
         this.trainer = trainer;
         this.court = court;
+        this.isPaid = false;
         getClients().addAll(clients);
         getParticipants().addAll(participants);
-        getEquipmentSet().addAll(equipmentList);
-    }
 
-    private Training(LocalDateTime start, Duration duration, Trainer trainer, Court court,
-                     List<Person> clients, List<Person> participants) {
-        this.start = start;
-        this.duration = duration;
-        this.trainer = trainer;
-        this.court = court;
-        getClients().addAll(clients);
-        getParticipants().addAll(participants);
-    }
+        if (equipmentList != null) {
+            getEquipmentSet().addAll(equipmentList);
+            equipmentList.forEach(e -> e.getTrainings().add(this));
+        }
 
-    private Training(LocalDateTime start, Duration duration, Trainer trainer, Court court,
-                     Person client, Person participant) {
-        this.start = start;
-        this.duration = duration;
-        this.trainer = trainer;
-        this.court = court;
-        getClients().add(client);
-        getParticipants().add(participant);
-    }
-
-    private Training(LocalDateTime start, Duration duration, Trainer trainer, Court court) {
-        this.start = start;
-        this.duration = duration;
-        this.trainer = trainer;
-        this.court = court;
+        trainer.getTrainings().add(this);
+        court.getTrainings().add(this);
+        clients.forEach(c -> c.getTrainingsBought().add(this));
+        participants.forEach(p -> p.getTrainings().add(this));
     }
 
     public static Training makeReservation(Person client, Person participant, Trainer trainer, Court court,
@@ -96,14 +83,7 @@ public class Training {
         if (!participant.getPersonTypes().contains(Person.PersonType.Participant))
             throw new TypeMismatchException("Person referred as participant is not a Participant instance");
 
-        var training = new Training(from, duration, trainer, court, client, participant);
-
-        trainer.getTrainings().add(training);
-        court.getTrainings().add(training);
-        client.getTrainingsBought().add(training);
-        participant.getTrainings().add(training);
-
-        return training;
+        return new Training(from, duration, trainer, court, List.of(client), List.of(participant), null);
     }
 
     public void pay() {
@@ -129,10 +109,11 @@ public class Training {
     @Override
     public String toString() {
         return "Training{" +
-                "start=" + start +
-                ", duration=" + duration +
-                ", trainer=" + trainer.getId() +
-                ", court=" + court.getNumber() +
+                "start=" + getStart() +
+                ", duration=" + getDuration() +
+                ", trainer=" + getTrainer().getId() +
+                ", court=" + getCourt().getNumber() +
+                ", isPaid=" + getIsPaid() +
                 '}';
     }
 

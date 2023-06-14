@@ -28,7 +28,9 @@ public class CourtUnroofed extends Court {
 
     @Override
     public boolean isAvailable(LocalDateTime from, Duration duration) {
-        return !from.isAfter(getSeasonStart().atStartOfDay()) || !from.isBefore(getSeasonEnd().atStartOfDay()) || super.isAvailable(from, duration);
+        return from.isAfter(getSeasonStart().atStartOfDay()) &&
+                from.isBefore(getSeasonEnd().atStartOfDay()) &&
+                super.isAvailable(from, duration);
     }
 
     @Override

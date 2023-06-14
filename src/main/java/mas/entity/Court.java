@@ -13,12 +13,15 @@ import mas.util.DBController;
 import mas.util.Util;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 @Entity
 @Getter
@@ -58,6 +61,11 @@ public abstract class Court {
                 .noneMatch(r -> Util.isOverlapping(from, duration, r.getStart(), r.getDuration())) &&
                 getTrainings().stream()
                         .noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()));
+    }
+
+    public boolean anyAvailable(LocalDate date) {
+        Duration d = Duration.between(getOpeningHour(), getClosingHour());
+        return IntStream.of((int)d.toHours()).anyMatch(h -> isAvailable(date.atTime(h, 0), Duration.ofHours(1)));
     }
 
     public static LocalTime getOpeningHour() {

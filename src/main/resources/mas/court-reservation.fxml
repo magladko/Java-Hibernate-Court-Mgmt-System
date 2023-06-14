@@ -19,6 +19,7 @@
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
     </rowConstraints>
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
@@ -54,10 +55,14 @@
         <Label text="Total Price:" />
         <Label fx:id="totalPriceLabel" text="" />
     </HBox>
-    <Button fx:id="confirmButton" mnemonicParsing="false" onAction="#showReservationSummary" text="Podsumowanie" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
     <TextArea fx:id="commentsTextArea" prefHeight="100.0" prefWidth="572.0" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
-   <Label text="*filters*" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-   <Label fx:id="trainerLabel" styleClass="trainer-label" stylesheets="@style.css" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+   <Label fx:id="trainerLabel" styleClass="trainer-label" stylesheets="@style.css" text="Label" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="80.0" GridPane.columnSpan="3" GridPane.rowIndex="7">
+      <children>
+         <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#cancelReservation" text="Anuluj" />
+          <Button fx:id="confirmButton" defaultButton="true" mnemonicParsing="false" onAction="#showReservationSummary" text="Podsumowanie" />
+      </children>
+   </HBox>
 
     <stylesheets>
         <URL value="@style.css" />

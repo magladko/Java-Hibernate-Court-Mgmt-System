@@ -1,14 +1,17 @@
 package mas.gui.controllers;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.StringConverter;
 import lombok.Getter;
+import mas.CourtReservationApp;
 import mas.entity.Court;
 import mas.entity.Reservation;
 import mas.entity.Trainer;
@@ -16,16 +19,21 @@ import mas.util.DBController;
 import mas.util.MoneyFormatCell;
 import mas.util.TrainerStringConverter;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class CourtReservationController {
 
+    // TODO: show court info
+
+    @FXML public Button cancelButton;
     @FXML private DatePicker datePicker;
     @FXML private TableView<Court> availabilityTable;
     @FXML private TableColumn<Court, Integer> courtNumberColumn;
@@ -46,6 +54,7 @@ public class CourtReservationController {
     private Reservation tempReservationDTO;
 
     private final SimpleObjectProperty<Court> currentCourt = new SimpleObjectProperty<>(null);
+    private final SimpleObjectProperty<Trainer> selectedTrainer = new SimpleObjectProperty<>(null);
 
     @FXML
     protected void initialize() {
@@ -54,11 +63,58 @@ public class CourtReservationController {
         availabilityTable.setSelectionModel(null);
         availabilityTable.setFocusModel(null);
 
+        datePickerSetup();
+
+        trainingCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
+        racketCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
+
+        confirmButton.disableProperty().bind(currentCourt.isNull());
+
+        trainerComboBox.disableProperty().bind(trainingCheckBox.selectedProperty().not());
+        selectedTrainer.bind(Bindings.when(trainingCheckBox.selectedProperty())
+                .then(trainerComboBox.valueProperty())
+                .otherwise((Trainer) null));
+        trainerComboBox.getItems().addAll(DBController.INSTANCE.getTrainers());
+
+        trainerLabel.textProperty().bind(selectedTrainer.map(t -> new TrainerStringConverter().toString(t)));
+        trainerMiscLabel.visibleProperty().bind(trainerLabel.textProperty().map(aString -> !aString.isEmpty()));
+
+        trainerComboBox.setConverter(new TrainerStringConverter());
+
+    }
+
+
+    public void showReservationSummary() {
+        throw new UnsupportedOperationException("Not yet implemented");
+        // Implement the logic for showing the reservation summary
+    }
+
+    public void cancelReservation() {
+        try {
+            CourtReservationApp.getStage().setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(CourtReservationApp.class.getResource("start.fxml"))), 600, 400));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void datePickerSetup() {
         datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
+                if (DBController.INSTANCE.getEm().createQuery("from Court", Court.class).getResultList().stream().noneMatch(c -> c.anyAvailable(newValue))) {
+                    datePicker.setValue(oldValue);
+
+                    datePicker.setOnHidden(event -> datePicker.show());
+                    return;
+                }
+                datePicker.setOnHidden(null);
                 updateAvailabilityTable();
             }
         });
+
+        datePicker.onMouseClickedProperty().addListener((observable, oldValue, newValue) -> datePicker.setOnHidden(null));
+
+        Tooltip datePickerCloudTooltip = new Tooltip("No court available on this date");
+        datePickerCloudTooltip.setShowDelay(javafx.util.Duration.seconds(0.1));
 
         datePicker.setDayCellFactory(picker -> new DateCell() {
             @Override
@@ -67,31 +123,16 @@ public class CourtReservationController {
 
                 if (date.isBefore(LocalDate.now().plusDays(1))) {
                     setDisable(true);
-                    setStyle("-fx-background-color: #cccccc;"); // Customize the disabled cell color
+                    getStyleClass().add("past-date");
+
+                } else if (DBController.INSTANCE.getEm().createQuery("from Court", Court.class).getResultList().stream().noneMatch(c -> c.anyAvailable(date))) {
+                    setOnMouseEntered(event -> Tooltip.install(this, datePickerCloudTooltip));
+                    setOnMouseExited(event -> Tooltip.uninstall(this, datePickerCloudTooltip));
+//                    setDisable(true);
+                    getStyleClass().add("datepicker-no-court-available");
                 }
             }
         });
-
-
-
-        trainingCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
-        racketCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
-
-        confirmButton.disableProperty().bind(currentCourt.isNull());
-
-        trainerComboBox.disableProperty().bind(trainingCheckBox.selectedProperty().not());
-        trainerComboBox.getItems().addAll(DBController.INSTANCE.getTrainers());
-
-        trainerLabel.textProperty().bind(trainerComboBox.valueProperty().map(t -> new TrainerStringConverter().toString(t)));
-        trainerMiscLabel.visibleProperty().bind(trainerLabel.textProperty().map(aString -> !aString.isEmpty()));
-
-        trainerComboBox.setConverter(new TrainerStringConverter());
-
-    }
-
-    public void showReservationSummary() {
-        throw new UnsupportedOperationException("Not yet implemented");
-        // Implement the logic for showing the reservation summary
     }
 
     /**
@@ -132,9 +173,8 @@ public class CourtReservationController {
                         setGraphic(null);
                         setText(null);
                     } else {
-                        boolean courtAvailable = column.getTableView().getItems().get(getIndex())
-                                .isAvailable(LocalTime.parse(column.getText(), DateTimeFormatter.ofPattern("HH:mm")).atDate(datePicker.getValue()), Duration.ofHours(1));
-
+                        Court court = column.getTableView().getItems().get(getIndex());
+                        boolean courtAvailable = court.isAvailable(LocalTime.parse(column.getText(), DateTimeFormatter.ofPattern("HH:mm")).atDate(datePicker.getValue()), Duration.ofHours(1));;
                         if (courtAvailable) {
                             // TODO: trainer's availability
 
@@ -177,11 +217,12 @@ public class CourtReservationController {
                         } else {
                             // Training or reservation at given time
                             setDisable(true);
-                            setStyle("-fx-background-color: #ffb4b4;" + "-fx-opacity: 0.4;");
+                            getStyleClass().add("unavailable-hour");
                         }
                     }
                 }
             });
+
 
             hourColumns.add(hourColumn);
             availabilityTable.getColumns().add(hourColumn);

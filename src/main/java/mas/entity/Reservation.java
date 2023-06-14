@@ -28,6 +28,9 @@ public class Reservation {
     @Column(nullable = false)
     private Duration duration;
 
+    @Column(nullable = false)
+    private Boolean isPaid;
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Court court;
@@ -51,10 +54,11 @@ public class Reservation {
         this.racket = racket;
         this.participant = participant;
         this.client = client;
+        this.isPaid = false;
     }
 
     public static Reservation makeReservation(LocalDateTime start, Duration duration, Court court, Racket racket,
-                                              Person client, Person participant) {
+                                              Person client, Person participant) throws TimeUnavailableException, TypeMismatchException {
         if (!client.getPersonTypes().contains(Person.PersonType.Client))
             throw new TypeMismatchException("First argument person type is not Client.");
         if (!participant.getPersonTypes().contains(Person.PersonType.Participant))
@@ -88,21 +92,24 @@ public class Reservation {
 
     public void pay() {
         // out of scope
+        throw new UnsupportedOperationException("out of scope");
     }
 
     public void cancel() {
         // out of scope
+        throw new UnsupportedOperationException("out of scope");
     }
 
     @Override
     public String toString() {
         return "Reservation{" +
-                "start=" + start +
-                ", duration=" + duration +
-                ", court=" + court.getNumber() +
-                ", participant=" + participant.getId() +
-                ", client=" + client.getId() +
-                ", racket=" + Optional.ofNullable(racket).map(Racket::getId).map(Object::toString).orElse("null") +
+                "start=" + getStart() +
+                ", duration=" + getDuration() +
+                ", court=" + getCourt().getNumber() +
+                ", participant=" + getParticipant().getId() +
+                ", client=" + getClient().getId() +
+                ", racket=" + Optional.ofNullable(getRacket()).map(Racket::getId).map(Object::toString).orElse("null") +
+                ", isPaid=" + getIsPaid() +
                 '}';
     }
 
