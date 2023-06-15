@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -90,10 +92,10 @@ public abstract class Court {
 
     @Transient
     @Getter
-    private ObservableMap<TableColumn<Court, Boolean>, BooleanProperty> markedHours = FXCollections.observableHashMap();
+    private LinkedHashMap<TableColumn<Court, Boolean>, BooleanProperty> markedHours = new LinkedHashMap<>();
 
-    @Transient
-    @Getter
-    private BooleanProperty disabledTableRow = new SimpleBooleanProperty(false);
+//    @Transient
+//    @Getter
+//    private BooleanProperty disabledTableRow = new SimpleBooleanProperty(false);
 
 }

@@ -11,6 +11,10 @@
     -fx-background-color: #cccccc;
 }
 
+.row-disabled, .disabled-hour {
+    -fx-opacity: 0.4;
+}
+
 .datepicker-no-court-available, .unavailable-hour {
     -fx-background-color: #ffb4b4;
     -fx-opacity: 0.4;
