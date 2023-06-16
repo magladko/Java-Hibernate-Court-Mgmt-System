@@ -20,6 +20,10 @@
     -fx-opacity: 0.4;
 }
 
+.trainer-available {
+    -fx-background-color: #80ff80;
+}
+
 .number-column, .price-column {
     -fx-alignment: center;
 }
