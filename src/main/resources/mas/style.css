@@ -21,8 +21,7 @@
 }
 
 .trainer-available {
-    -fx-background-color: #afffaf;
-    -fx-border-color: #036500;
+    -fx-background-color: #74ff87;
 }
 
 .number-column, .price-column {

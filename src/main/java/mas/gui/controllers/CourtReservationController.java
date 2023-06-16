@@ -101,6 +101,7 @@ public class CourtReservationController {
 
     private void datePickerSetup() {
         datePicker.setOnHidden(event -> {
+            if (datePicker.getValue() == null) return;
             if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(datePicker.getValue())))
                 datePicker.show();
             else {
