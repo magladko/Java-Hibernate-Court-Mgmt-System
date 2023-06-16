@@ -219,6 +219,8 @@ public class CourtReservationController {
                     nextCellValueProperty = court.getMarkedHours().values().toArray(new BooleanProperty[0])[currentHourColumnIndex + 1];
 
                 BooleanBinding disableAndStyleBinding = Bindings.createBooleanBinding(() -> {
+                    System.out.println("AAAA");
+
                     cell.getStyleClass().removeAll("disabled-hour", "unavailable-hour", "trainer-available");
 
                     if (cell.getTableRow().getItem() == null || cell.getItem() == null) {
@@ -231,8 +233,15 @@ public class CourtReservationController {
                         return true;
                     }
 
-                    if (selectedTrainer.getValue() != null && selectedTrainer.get().isAvailable(time, Duration.ofHours(1))) {
+                    boolean trainerAvailableOrNull = selectedTrainer.getValue() == null;
+                    if (!trainerAvailableOrNull && selectedTrainer.get().isAvailable(time, Duration.ofHours(1))) {
                         cell.getStyleClass().add("trainer-available");
+                        trainerAvailableOrNull = true;
+                    }
+
+                    if (!trainerAvailableOrNull) {
+                        cell.getStyleClass().add("disabled-hour");
+                        return true;
                     }
 
                     if (currentCourt.getValue() == null || !currentCourt.getValue().equals(court)) {
