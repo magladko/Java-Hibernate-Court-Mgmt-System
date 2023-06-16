@@ -115,7 +115,7 @@ public class CourtReservationController {
 
         datePicker.onMouseClickedProperty().addListener((observable, oldValue, newValue) -> datePicker.setOnHidden(null));
 
-        Tooltip datePickerCloudTooltip = new Tooltip("No court available on this date");
+        Tooltip datePickerCloudTooltip = new Tooltip("Brak dostępnych kortów");
         datePickerCloudTooltip.setShowDelay(javafx.util.Duration.seconds(0.1));
 
         datePicker.setDayCellFactory(picker -> new DateCell() {
@@ -219,50 +219,44 @@ public class CourtReservationController {
                     nextCellValueProperty = court.getMarkedHours().values().toArray(new BooleanProperty[0])[currentHourColumnIndex + 1];
 
                 BooleanBinding disableAndStyleBinding = Bindings.createBooleanBinding(() -> {
+                    cell.getStyleClass().removeAll("disabled-hour", "unavailable-hour", "trainer-available");
 
-                    cell.getStyleClass().remove("disabled-hour");
-                    cell.getStyleClass().remove("unavailable-hour");
+                    if (cell.getTableRow().getItem() == null || cell.getItem() == null) {
+                        return false;
+                    }
 
-                    if (cell.getTableRow().getItem() == null || cell.getItem() == null) return false;
-
-                    // The court is not available at a time
                     var time = (new HourColumnHeaderStrConv().fromString(column.getText())).atDate(datePicker.getValue());
                     if (!court.isAvailable(time, Duration.ofHours(1))) {
                         cell.getStyleClass().add("unavailable-hour");
                         return true;
                     }
 
-                    // No constraints if no court is selected
-                    if (currentCourt.getValue() == null) return false;
+                    if (selectedTrainer.getValue() != null && selectedTrainer.get().isAvailable(time, Duration.ofHours(1))) {
+                        cell.getStyleClass().add("trainer-available");
+                    }
 
-                    // Managed by row factory
-                    if (!currentCourt.getValue().equals(court)) {
-                        return false;
+                    if (currentCourt.getValue() == null || !currentCourt.getValue().equals(court)) {
+                        return false; // managed by row factory
                     }
 
                     int markedHours = court.getMarkedHours().values().stream().mapToInt(value -> value.get() ? 1 : 0).sum();
                     if (markedHours == 1) {
-                        // disabled if cell is unmarked and neighbour is marked (or edge)
                         if (!previousCellValueProperty.orElse(false).getValue() && !nextCellValueProperty.orElse(false).getValue() && !cell.getItem()) {
                             cell.getStyleClass().add("disabled-hour");
                             return true;
                         }
-                    } else {
-                        if (previousCellValueProperty.getValue() || cell.getItem() | nextCellValueProperty.getValue()) {
-                            if (previousCellValueProperty.getValue() && cell.getItem() && nextCellValueProperty.getValue()) {
-                                cell.getStyleClass().add("disabled-hour");
-                                return true;
-                            } else {
-                                return false;
-                            }
-                        } else {
+                    } else if (previousCellValueProperty.getValue() || cell.getItem() || nextCellValueProperty.getValue()) {
+                        if (previousCellValueProperty.getValue() && cell.getItem() && nextCellValueProperty.getValue()) {
                             cell.getStyleClass().add("disabled-hour");
                             return true;
                         }
+                    } else {
+                        cell.getStyleClass().add("disabled-hour");
+                        return true;
                     }
 
                     return false;
-                }, currentCourt, previousCellValueProperty, nextCellValueProperty);
+                }, currentCourt, selectedTrainer, previousCellValueProperty, nextCellValueProperty);
 
                 cell.disableProperty().bind(disableAndStyleBinding);
             }
