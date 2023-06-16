@@ -100,8 +100,8 @@
 
     <TableView fx:id="availabilityTable" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="200.0" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
         <columns>
-            <TableColumn fx:id="courtNumberColumn" editable="false" prefWidth="-1.0" reorderable="false" styleClass="number-column" text="Nr" />
-            <TableColumn fx:id="priceColumn" editable="false" prefWidth="-1.0" reorderable="false" styleClass="price-column" text="Cena za godzinę" />
+            <TableColumn fx:id="courtNumberColumn" editable="false" prefWidth="-1.0" reorderable="false" sortable="false" styleClass="number-column" text="Nr" />
+            <TableColumn fx:id="priceColumn" editable="false" prefWidth="-1.0" reorderable="false" sortable="false" styleClass="price-column" text="Cena za godzinę" />
             <!-- Hour columns (programmatically) -->
         </columns>
         <columnResizePolicy>

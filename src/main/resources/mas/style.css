@@ -13,15 +13,18 @@
 
 .row-disabled, .disabled-hour {
     -fx-opacity: 0.4;
+    -fx-alignment: center;
 }
 
 .datepicker-no-court-available, .unavailable-hour {
     -fx-background-color: #ffb4b4;
     -fx-opacity: 0.4;
+    -fx-alignment: center;
 }
 
 .trainer-available {
     -fx-background-color: #99ffaa;
+    -fx-alignment: center;
 }
 
 .number-column, .price-column {
@@ -31,4 +34,8 @@
 .table-title {
     -fx-font-size: 16px;
     -fx-font-weight: BOLD;
+}
+
+.table-cell {
+    -fx-alignment: center;
 }

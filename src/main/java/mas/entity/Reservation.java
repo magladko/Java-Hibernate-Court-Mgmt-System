@@ -86,8 +86,21 @@ public class Reservation {
     }
 
     public BigDecimal getTotalPrice() {
-        // TODO: getting total price of reservation
-        throw new UnsupportedOperationException("not implemented yet");
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        if (getCourt() instanceof CourtRoofed) {
+            totalPrice = totalPrice.add(CourtRoofed.getPricePerHour().multiply(BigDecimal.valueOf(getDuration().toHours())));
+            if (LocalDateTime.now().isAfter(CourtRoofed.getHeatingSeasonStart().atStartOfDay()) && LocalDateTime.now().isBefore(CourtRoofed.getHeatingSeasonEnd().atStartOfDay())) {
+                totalPrice = totalPrice.add(CourtRoofed.getHeatingSurcharge());
+            }
+        } else if (getCourt() instanceof CourtUnroofed) {
+            totalPrice = totalPrice.add(CourtUnroofed.getPricePerHour().multiply(BigDecimal.valueOf(getDuration().toHours())));
+        }
+
+        if (getRacket() != null) {
+            totalPrice = totalPrice.add(getRacket().getPricePerHour().multiply(BigDecimal.valueOf(getDuration().toHours())));
+        }
+
+        return totalPrice;
     }
 
     public void pay() {

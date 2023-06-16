@@ -3,11 +3,7 @@ package mas.util;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import mas.CourtReservationApp;
 import mas.entity.Court;
-import mas.entity.CourtRoofed;
-import mas.entity.CourtUnroofed;
 
 public class ButtonTableCell extends TableCell<Court, Integer> {
     private final Button button;

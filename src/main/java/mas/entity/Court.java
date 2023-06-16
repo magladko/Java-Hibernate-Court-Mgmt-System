@@ -2,13 +2,9 @@ package mas.entity;
 
 import jakarta.persistence.*;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableMap;
 import javafx.scene.control.TableColumn;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import mas.util.DBController;
 import mas.util.Util;
@@ -19,7 +15,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -107,9 +102,5 @@ public abstract class Court {
     @Transient
     @Getter
     private LinkedHashMap<TableColumn<Court, Boolean>, BooleanProperty> markedHours = new LinkedHashMap<>();
-
-//    @Transient
-//    @Getter
-//    private BooleanProperty disabledTableRow = new SimpleBooleanProperty(false);
 
 }

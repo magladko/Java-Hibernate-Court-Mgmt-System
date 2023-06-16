@@ -2,10 +2,12 @@ package mas.gui.controllers;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.binding.ObjectBinding;
+import javafx.beans.property.*;
+import javafx.beans.property.adapter.JavaBeanObjectProperty;
+import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.beans.value.ObservableBooleanValue;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +33,7 @@ import java.util.Objects;
 
 public class CourtReservationController {
 
-    @FXML public Button cancelButton;
+    @FXML private Button cancelButton;
     @FXML private DatePicker datePicker;
     @FXML private TableView<Court> availabilityTable;
     @FXML private TableColumn<Court, Integer> courtNumberColumn;
@@ -47,9 +50,6 @@ public class CourtReservationController {
 
     private final List<TableColumn<Court, Boolean>> hourColumns = new ArrayList<>();
 
-    @Getter
-    private Reservation tempReservationDTO;
-
     private final SimpleObjectProperty<Court> currentCourt = new SimpleObjectProperty<>(null);
     private final SimpleObjectProperty<Trainer> selectedTrainer = new SimpleObjectProperty<>(null);
 
@@ -59,6 +59,14 @@ public class CourtReservationController {
         availabilityTable.setDisable(true);
         availabilityTable.setSelectionModel(null);
         availabilityTable.setFocusModel(null);
+
+        selectedTrainer.bindBidirectional(ReservationData.getTrainer());
+        currentCourt.bindBidirectional(ReservationData.getCourt());
+        ReservationData.getStart().bind(Bindings.createObjectBinding(() -> {
+            LocalDate date = datePicker.getValue();
+            if (date == null) return null;
+            return LocalDateTime.of(date, LocalTime.MIDNIGHT);
+        }, datePicker.valueProperty()));
 
         datePickerSetup();
 
@@ -76,8 +84,9 @@ public class CourtReservationController {
         trainerLabel.textProperty().bind(selectedTrainer.map(t -> new TrainerStringConverter().toString(t)));
         trainerMiscLabel.visibleProperty().bind(trainerLabel.textProperty().map(aString -> !aString.isEmpty()));
 
-        trainerComboBox.setConverter(new TrainerStringConverter());
 
+
+        trainerComboBox.setConverter(new TrainerStringConverter());
     }
 
 
@@ -88,6 +97,7 @@ public class CourtReservationController {
 
     public void cancelReservation() {
         try {
+            ReservationData.cancel();
             CourtReservationApp.getStage().setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(CourtReservationApp.class.getResource("start.fxml"))), 600, 400));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -95,19 +105,30 @@ public class CourtReservationController {
     }
 
     private void datePickerSetup() {
-        datePicker.setOnHidden(event -> {
-            if (datePicker.getValue() == null) return;
-            if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(datePicker.getValue())))
-                datePicker.show();
-            else {
-                datePicker.hide();
+//        datePicker.setOnHidden(event -> {
+//            if (datePicker.getValue() == null) return;
+//            if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(datePicker.getValue())))
+//                datePicker.show();
+//            else {
+//                datePicker.hide();
+//                updateAvailabilityTable();
+//            }
+//        });
+
+        datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) return;
+            if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(newValue))){
+                datePicker.setValue(oldValue);
+            } else {
                 updateAvailabilityTable();
             }
         });
 
-        datePicker.onHiddenProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Hidden");
-        });
+        // disable datepicker if any hour is selected:
+        BooleanBinding anyHourSelected = Bindings.createBooleanBinding(() -> currentCourt.get() != null && currentCourt.get().getMarkedHours().values().stream().anyMatch(ObservableBooleanValue::get), currentCourt);
+        datePicker.disableProperty().bind(anyHourSelected);
+
+//        datePicker.disableProperty().bind()
 
         Tooltip datePickerCloudTooltip = new Tooltip("Brak dostępnych kortów");
         datePickerCloudTooltip.setShowDelay(javafx.util.Duration.seconds(0.1));
@@ -141,11 +162,7 @@ public class CourtReservationController {
         availabilityTable.setEditable(true);
 
         courtNumberColumn.setCellValueFactory(new PropertyValueFactory<>("number"));
-        courtNumberColumn.setCellFactory(column -> {
-            ButtonTableCell cell = new ButtonTableCell();
-
-            return cell;
-        });
+        courtNumberColumn.setCellFactory(column -> new ButtonTableCell());
 
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerHour"));
         priceColumn.setCellFactory(list -> new MoneyFormatCell());
@@ -158,6 +175,7 @@ public class CourtReservationController {
             LocalTime hour = startTime.plusHours(i);
             TableColumn<Court, Boolean> hourColumn = new TableColumn<>(new HourColumnHeaderStrConv().toString(hour));
             hourColumn.setReorderable(false);
+            hourColumn.setSortable(false);
 
             hourColumn.setCellValueFactory(features -> features.getValue().getMarkedHours().get(hourColumn));
             hourColumn.setCellFactory(this::hourCellFactory);
@@ -216,7 +234,9 @@ public class CourtReservationController {
                     nextCellValueProperty = court.getMarkedHours().values().toArray(new BooleanProperty[0])[currentHourColumnIndex + 1];
 
                 BooleanBinding disableAndStyleBinding = Bindings.createBooleanBinding(() -> {
-                    cell.getStyleClass().removeAll("disabled-hour", "unavailable-hour", "trainer-available");
+                    cell.getStyleClass().remove("disabled-hour");
+                    cell.getStyleClass().remove("unavailable-hour");
+                    cell.getStyleClass().remove("trainer-available");
 
                     if (cell.getTableRow().getItem() == null || cell.getItem() == null) {
                         return false;

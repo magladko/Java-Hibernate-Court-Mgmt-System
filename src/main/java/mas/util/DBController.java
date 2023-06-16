@@ -1,6 +1,7 @@
 package mas.util;
 
 import jakarta.persistence.EntityManager;
+import javafx.beans.property.SimpleObjectProperty;
 import lombok.Getter;
 import lombok.Setter;
 import mas.entity.*;
@@ -17,6 +18,16 @@ public enum DBController {
     @Getter
     @Setter
     private EntityManager em;
+
+    @Getter
+    @Setter
+    private Person client;
+
+    @Getter
+    private final SimpleObjectProperty<Reservation> tempReservation = new SimpleObjectProperty<>();
+
+    @Getter
+    private final SimpleObjectProperty<Training> tempTraining = new SimpleObjectProperty<>();
 
     public void seedDb() {
         try {
