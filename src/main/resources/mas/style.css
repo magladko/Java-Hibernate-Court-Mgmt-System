@@ -21,9 +21,14 @@
 }
 
 .trainer-available {
-    -fx-background-color: #74ff87;
+    -fx-background-color: #99ffaa;
 }
 
 .number-column, .price-column {
     -fx-alignment: center;
+}
+
+.table-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: BOLD;
 }

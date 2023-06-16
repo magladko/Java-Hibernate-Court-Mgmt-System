@@ -17,10 +17,7 @@ import mas.CourtReservationApp;
 import mas.entity.Court;
 import mas.entity.Reservation;
 import mas.entity.Trainer;
-import mas.util.DBController;
-import mas.util.HourColumnHeaderStrConv;
-import mas.util.MoneyFormatCell;
-import mas.util.TrainerStringConverter;
+import mas.util.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -32,8 +29,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class CourtReservationController {
-
-    // TODO: show court info
 
     @FXML public Button cancelButton;
     @FXML private DatePicker datePicker;
@@ -146,6 +141,11 @@ public class CourtReservationController {
         availabilityTable.setEditable(true);
 
         courtNumberColumn.setCellValueFactory(new PropertyValueFactory<>("number"));
+        courtNumberColumn.setCellFactory(column -> {
+            ButtonTableCell cell = new ButtonTableCell();
+
+            return cell;
+        });
 
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerHour"));
         priceColumn.setCellFactory(list -> new MoneyFormatCell());

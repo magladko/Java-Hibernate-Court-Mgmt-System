@@ -29,7 +29,19 @@ import java.util.stream.IntStream;
 @NoArgsConstructor
 public abstract class Court {
 
-    public enum SurfaceType { Grass, Clay, Hard, ArtificialGrass }
+    public enum SurfaceType {
+        Grass("Trawa"), Clay("Glina"), Hard("Beton"), ArtificialGrass("Sztuczna trawa");
+
+        private final String surfaceName;
+        SurfaceType(String surfaceName) {
+            this.surfaceName = surfaceName;
+        }
+
+        @Override
+        public String toString() {
+            return surfaceName;
+        }
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -84,6 +96,8 @@ public abstract class Court {
 
         return getNumber().equals(court.getNumber());
     }
+
+    public abstract String getInfoTxt();
 
     @Override
     public int hashCode() {

@@ -8,7 +8,12 @@ import lombok.Setter;
 import mas.util.DBController;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 @Entity
 @Getter
@@ -16,7 +21,19 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class CourtRoofed extends Court {
 
-    public enum RoofType { Hall, Balloon }
+    public enum RoofType {
+        Hall("Hala"), Balloon("Balon");
+
+        private final String name;
+        RoofType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     @Enumerated
     private RoofType roofType;
@@ -59,4 +76,15 @@ public class CourtRoofed extends Court {
 //        return heatingSeasonEnd;
     }
 
+    @Override
+    public String getInfoTxt() {
+        DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault());
+
+        return "Zadaszenie: " + getRoofType() + "\n" +
+                "Nawierzchnia: " + getSurfaceType() + "\n" +
+                "Cena poza sezonem grzewczym: " + NumberFormat.getCurrencyInstance().format(getPricePerHour()) + "\n" +
+                "Początek sezonu grzewczego: " +  getHeatingSeasonStart().format(df) + "\n" +
+                "Koniec sezonu grzewczego: " + getHeatingSeasonEnd().format(df) + "\n" +
+                "Dopłata grzewcza: " + NumberFormat.getCurrencyInstance().format(getHeatingSurcharge()) + "\n";
+    }
 }
