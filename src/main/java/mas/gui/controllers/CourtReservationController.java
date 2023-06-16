@@ -100,20 +100,18 @@ public class CourtReservationController {
     }
 
     private void datePickerSetup() {
-        datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(newValue))) {
-                    datePicker.setValue(oldValue);
-
-                    datePicker.setOnHidden(event -> datePicker.show());
-                    return;
-                }
-                datePicker.setOnHidden(null);
+        datePicker.setOnHidden(event -> {
+            if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(datePicker.getValue())))
+                datePicker.show();
+            else {
+                datePicker.hide();
                 updateAvailabilityTable();
             }
         });
 
-        datePicker.onMouseClickedProperty().addListener((observable, oldValue, newValue) -> datePicker.setOnHidden(null));
+        datePicker.onHiddenProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Hidden");
+        });
 
         Tooltip datePickerCloudTooltip = new Tooltip("Brak dostępnych kortów");
         datePickerCloudTooltip.setShowDelay(javafx.util.Duration.seconds(0.1));
@@ -130,7 +128,6 @@ public class CourtReservationController {
                 } else if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(date))) {
                     setOnMouseEntered(event -> Tooltip.install(this, datePickerCloudTooltip));
                     setOnMouseExited(event -> Tooltip.uninstall(this, datePickerCloudTooltip));
-//                    setDisable(true);
                     getStyleClass().add("datepicker-no-court-available");
                 }
             }
@@ -162,7 +159,6 @@ public class CourtReservationController {
             hourColumn.setReorderable(false);
 
             hourColumn.setCellValueFactory(features -> features.getValue().getMarkedHours().get(hourColumn));
-
             hourColumn.setCellFactory(this::hourCellFactory);
 
             hourColumns.add(hourColumn);
@@ -219,8 +215,6 @@ public class CourtReservationController {
                     nextCellValueProperty = court.getMarkedHours().values().toArray(new BooleanProperty[0])[currentHourColumnIndex + 1];
 
                 BooleanBinding disableAndStyleBinding = Bindings.createBooleanBinding(() -> {
-                    System.out.println("AAAA");
-
                     cell.getStyleClass().removeAll("disabled-hour", "unavailable-hour", "trainer-available");
 
                     if (cell.getTableRow().getItem() == null || cell.getItem() == null) {
