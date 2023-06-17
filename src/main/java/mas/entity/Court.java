@@ -57,42 +57,36 @@ public abstract class Court {
     @OneToMany(mappedBy = "court")
     private Set<Reservation> reservations = new HashSet<>();
 
-    public void setReservations(Set<Reservation> reservations) {
-        reservations.forEach(r -> {
-            if (r.getCourt() == null || r.getCourt() != this) r.setCourt(this);
-        });
-        this.getReservations().forEach(r -> {
-            if (!reservations.contains(r)) r.setCourt(null);
-        });
-
-        this.reservations = reservations;
-    }
-
     public void addReservations(Reservation... reservations) {
         for (Reservation r : reservations) {
-            this.getReservations().add(r);
-            if (r.getCourt() == null || r.getCourt() != this) r.setCourt(this);
+            if (!getReservations().contains(r)) {
+                this.getReservations().add(r);
+                r.setCourt(this);
+            }
+        }
+    }
+
+    public void removeReservations(Reservation... reservations) {
+        for (Reservation r : reservations) {
+            this.getReservations().remove(r);
+            if (r.getCourt() == this) r.setCourt(null);
         }
     }
 
     @OneToMany(mappedBy = "court")
     private Set<Training> trainings = new HashSet<>();
 
-    public void setTrainings(Set<Training> trainings) {
-        trainings.forEach(t -> {
-            if (t.getCourt() == null || t.getCourt() != this) t.setCourt(this);
-        });
-        this.getTrainings().forEach(t -> {
-            if (!trainings.contains(t)) t.setCourt(null);
-        });
-
-        this.trainings = trainings;
-    }
-
     public void addTrainings(Training... trainings) {
         for (Training t : trainings) {
             this.getTrainings().add(t);
             if (t.getCourt() == null || t.getCourt() != this) t.setCourt(this);
+        }
+    }
+
+    public void removeTrainings(Training... trainings) {
+        for (Training t : trainings) {
+            this.getTrainings().remove(t);
+            if (t.getCourt() == this) t.setCourt(null);
         }
     }
 

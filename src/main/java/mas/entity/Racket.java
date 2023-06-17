@@ -32,6 +32,24 @@ public class Racket extends Equipment {
     @OneToMany(mappedBy = "racket")
     private Set<Reservation> reservations = new HashSet<>();
 
+    public void addReservations(Reservation... reservations) {
+        for (Reservation r : reservations) {
+            if (!this.getReservations().contains(r)) {
+                this.getReservations().add(r);
+                r.setRacket(this);
+            }
+        }
+    }
+
+    public void removeReservations(Reservation... reservations) {
+        for (Reservation r : reservations) {
+            if (this.getReservations().contains(r)) {
+                this.getReservations().remove(r);
+                r.setRacket(null);
+            }
+        }
+    }
+
     public Racket(String manufacturer, Double weight, BigDecimal pricePerHour) {
         this.manufacturer = manufacturer;
         this.weight = weight;
@@ -53,9 +71,8 @@ public class Racket extends Equipment {
 
     public boolean makeReservation(Reservation reservation) {
         if (!isAvailable(reservation.getStart(), reservation.getDuration())) return false;
-
-        reservation.setRacket(this);
-        return getReservations().add(reservation);
+        addReservations(reservation);
+        return true;
     }
 
     @Override

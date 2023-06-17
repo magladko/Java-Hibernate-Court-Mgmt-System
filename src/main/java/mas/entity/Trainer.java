@@ -62,6 +62,13 @@ public class Trainer {
     @OneToMany(mappedBy = "trainer")
     private Set<Training> trainings = new HashSet<>();
 
+    public void addTrainings(Training training) {
+        if (!getTrainings().contains(training)) {
+            getTrainings().add(training);
+            training.setTrainer(this);
+        }
+    }
+
     public Trainer(String name, String surname, String phoneNr, String email,
                    TrainerQualification qualification, BigDecimal pricePerHour,
                    Map<DayOfWeek, WorkingHours> workingHours) {

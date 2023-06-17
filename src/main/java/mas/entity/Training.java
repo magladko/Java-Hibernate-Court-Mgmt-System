@@ -38,22 +38,26 @@ public class Training {
     @JoinColumn(nullable = false)
     private Trainer trainer;
 
+    public void setTrainer(Trainer trainer) {
+        if (getTrainer() != null && getTrainer().equals(trainer)) return;
+        if (this.trainer != null) this.trainer.getTrainings().remove(this);
+        this.trainer = trainer;
+        getTrainer().addTrainings(this);
+    }
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Court court;
 
+    public void setCourt(Court court) {
+        if (getCourt() != null && getCourt().equals(court)) return;
+        if (getCourt() != null) this.getCourt().removeTrainings(this);
+        this.court = court;
+        if (getCourt() != null) getCourt().addTrainings(this);
+    }
+
     @ManyToMany
     private Set<Equipment> equipmentSet = new HashSet<>();
-
-    public void setEquipmentSet(Set<Equipment> equipmentSet) {
-        equipmentSet.forEach(e -> {
-            if (!e.getTrainings().contains(this)) e.addTrainings(this);
-        });
-        this.getEquipmentSet().forEach(e -> {
-            if (!equipmentSet.contains(e)) e.getTrainings().remove(this);
-        });
-        this.equipmentSet = equipmentSet;
-    }
 
     public void addEquipment(Equipment... equipment) {
         for (Equipment e : equipment) {
@@ -64,34 +68,77 @@ public class Training {
         }
     }
 
+    public void removeEquipment(Equipment... equipment) {
+        for (Equipment e : equipment) {
+            if (this.getEquipmentSet().contains(e)) {
+                this.getEquipmentSet().remove(e);
+                e.removeTrainings(this);
+            }
+        }
+    }
+
     @ManyToMany
     @JoinTable(name = "trainings_clients")
     private Set<Person> clients = new HashSet<>();
 
+    public void addClients(Person... clients) {
+        for (Person c : clients) {
+            if (!c.getPersonTypes().contains(Person.PersonType.Client))
+                throw new TypeMismatchException("Person referred as client is not a Client instance");
+
+            if (!this.getClients().contains(c)) {
+                this.getClients().add(c);
+                c.addTrainingsBought(this);
+            }
+        }
+    }
+
+    public void removeClients(Person... clients) {
+        for (Person c : clients) {
+            if (this.getClients().contains(c)) {
+                this.getClients().remove(c);
+                c.removeTrainingsBought(this);
+            }
+        }
+    }
+
     @ManyToMany
     @JoinTable(name = "trainings_participants")
     private Set<Person> participants = new HashSet<>();
+
+    public void addParticipants(Person... participants) {
+        for (Person p : participants) {
+            if (!p.getPersonTypes().contains(Person.PersonType.Participant))
+                throw new TypeMismatchException("Person referred as participant is not a Participant instance");
+
+            if (!this.getParticipants().contains(p)) {
+                this.getParticipants().add(p);
+                p.addTrainings(this);
+            }
+        }
+    }
+
+    public void removeParticipants(Person... participants) {
+        for (Person p : participants) {
+            if (this.getParticipants().contains(p)) {
+                this.getParticipants().remove(p);
+                p.removeTrainings(this);
+            }
+        }
+    }
 
     private Training(LocalDateTime start, Duration duration, Trainer trainer, Court court,
                      List<Person> clients, List<Person> participants,
                      List<Equipment> equipmentList) {
         this.start = start;
         this.duration = duration;
-        this.trainer = trainer;
-        this.court = court;
+        setCourt(court);
+        // -- end needed non-null for hashcode
+        setTrainer(trainer);
         this.isPaid = false;
-        getClients().addAll(clients);
-        getParticipants().addAll(participants);
-
-        if (equipmentList != null) {
-            getEquipmentSet().addAll(equipmentList);
-            equipmentList.forEach(e -> e.getTrainings().add(this));
-        }
-
-        trainer.getTrainings().add(this);
-        court.getTrainings().add(this);
-        clients.forEach(c -> c.getTrainingsBought().add(this));
-        participants.forEach(p -> p.getTrainings().add(this));
+        addClients(clients.toArray(Person[]::new));
+        addParticipants(participants.toArray(Person[]::new));
+        addEquipment(equipmentList.toArray(Equipment[]::new));
     }
 
     public static Training makeReservation(Person client, Person participant, Trainer trainer, Court court,
@@ -103,7 +150,7 @@ public class Training {
         if (!participant.getPersonTypes().contains(Person.PersonType.Participant))
             throw new TypeMismatchException("Person referred as participant is not a Participant instance");
 
-        return new Training(from, duration, trainer, court, List.of(client), List.of(participant), null);
+        return new Training(from, duration, trainer, court, List.of(client), List.of(participant), List.of());
     }
 
     public void pay() {
@@ -146,7 +193,6 @@ public class Training {
     public int hashCode() {
         int result = getStart().hashCode();
         result = 31 * result + getDuration().hashCode();
-        result = 31 * result + getTrainer().hashCode();
         result = 31 * result + getCourt().hashCode();
         return result;
     }

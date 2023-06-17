@@ -10,6 +10,7 @@ import org.hibernate.TypeMismatchException;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 @Entity
@@ -35,25 +36,59 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Court court;
 
+    public void setCourt(Court court) {
+        if (this.getCourt() != null && this.getCourt().equals(court)) return;
+        if (this.getCourt() != null) this.getCourt().getReservations().remove(this);
+        this.court = court;
+        if (this.getCourt() != null) this.getCourt().addReservations(this);
+    }
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Person participant;
+
+    public void setParticipant(Person participant) {
+        if (!participant.getPersonTypes().contains(Person.PersonType.Participant))
+            throw new TypeMismatchException("Person is not a participant");
+
+        if (this.getParticipant() != null && this.getParticipant().equals(participant)) return;
+        if (this.getParticipant() != null) this.getParticipant().getReservations().remove(this);
+        this.participant = participant;
+        if (this.getParticipant() != null) getParticipant().addReservations(this);
+    }
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Person client;
 
+    public void setClient(Person client) {
+        if (client != null && !client.getPersonTypes().contains(Person.PersonType.Client))
+            throw new TypeMismatchException("Person is not a client");
+
+        if (this.getClient() != null && this.getClient().equals(client)) return;
+        if (this.getClient() != null) this.getClient().getReservationsBought().remove(this);
+        this.client = client;
+        if (this.getClient() != null) getClient().addReservationsBought(this);
+    }
+
     @ManyToOne
     private Racket racket;
+
+    public void setRacket(Racket racket) {
+        if (this.getRacket() != null && this.getRacket().equals(racket)) return;
+        if (this.getRacket() != null) this.getRacket().getReservations().remove(this);
+        this.racket = racket;
+        if (this.getRacket() != null) getRacket().addReservations(this);
+    }
 
     private Reservation(LocalDateTime start, Duration duration, Court court, Racket racket,
                         Person client, Person participant) {
         this.start = start;
         this.duration = duration;
-        this.court = court;
-        this.racket = racket;
-        this.participant = participant;
-        this.client = client;
+        setCourt(court);
+        setRacket(racket);
+        setParticipant(participant);
+        setClient(client);
         this.isPaid = false;
     }
 
@@ -67,18 +102,16 @@ public class Reservation {
         if (!court.isAvailable(start, duration))
             throw new TimeUnavailableException(court, start, duration);
 
-        var reservation = new Reservation(start, duration, court, null, participant, client);
+        //        court.getReservations().add(reservation);
+//        client.getReservationsBought().add(reservation);
+//        participant.getReservations().add(reservation);
+//
+//        if (racket != null) {
+//            reservation.setRacket(racket);
+//            racket.getReservations().add(reservation);
+//        }
 
-        court.getReservations().add(reservation);
-        client.getReservationsBought().add(reservation);
-        participant.getReservations().add(reservation);
-
-        if (racket != null) {
-            reservation.setRacket(racket);
-            racket.getReservations().add(reservation);
-        }
-
-        return reservation;
+        return new Reservation(start, duration, court, null, participant, client);
     }
 
     public static Reservation makeReservation(LocalDateTime start, Duration duration, Court court, Person client, Person participant) {
@@ -143,8 +176,8 @@ public class Reservation {
         int result = getStart().hashCode();
         result = 31 * result + getDuration().hashCode();
         result = 31 * result + getCourt().hashCode();
-        result = 31 * result + getParticipant().hashCode();
-        result = 31 * result + getClient().hashCode();
+//        result = 31 * result + getParticipant().hashCode();
+//        result = 31 * result + getClient().hashCode();
         return result;
     }
 }

@@ -27,21 +27,20 @@ public abstract class Equipment {
     @ManyToMany(mappedBy = "equipmentSet")
     private Set<Training> trainings = new HashSet<>();
 
-    public void setTrainings(Set<Training> trainings) {
-        trainings.forEach(t -> {
-            if (!t.getEquipmentSet().contains(this)) t.addEquipment(this);
-        });
-        this.getTrainings().forEach(r -> {
-            if (!trainings.contains(r)) r.setCourt(null);
-        });
-        this.trainings = trainings;
-    }
-
     public void addTrainings(Training... trainings) {
         for (Training t : trainings) {
             if (!this.getTrainings().contains(t)) {
                 this.getTrainings().add(t);
                 t.addEquipment(this);
+            }
+        }
+    }
+
+    public void removeTrainings(Training... trainings) {
+        for (Training t : trainings) {
+            if (this.getTrainings().contains(t)) {
+                this.getTrainings().remove(t);
+                t.removeEquipment(this);
             }
         }
     }
