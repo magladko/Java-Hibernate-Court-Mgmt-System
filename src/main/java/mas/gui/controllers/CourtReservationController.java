@@ -63,6 +63,13 @@ public class CourtReservationController {
             return LocalDateTime.of(date, LocalTime.MIDNIGHT);
         }, datePicker.valueProperty()));
 
+
+        totalPriceLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+
+
+            return "";
+        }, ReservationData.getCourt(), ReservationData.getStart(), ReservationData.getDuration(), ReservationData.getRacket(), ReservationData.getTrainer()));
+
         datePickerSetup();
 
         trainingCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
