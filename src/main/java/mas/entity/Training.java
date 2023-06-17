@@ -45,6 +45,25 @@ public class Training {
     @ManyToMany
     private Set<Equipment> equipmentSet = new HashSet<>();
 
+    public void setEquipmentSet(Set<Equipment> equipmentSet) {
+        equipmentSet.forEach(e -> {
+            if (!e.getTrainings().contains(this)) e.addTrainings(this);
+        });
+        this.getEquipmentSet().forEach(e -> {
+            if (!equipmentSet.contains(e)) e.getTrainings().remove(this);
+        });
+        this.equipmentSet = equipmentSet;
+    }
+
+    public void addEquipment(Equipment... equipment) {
+        for (Equipment e : equipment) {
+            if (!this.getEquipmentSet().contains(e)) {
+                this.getEquipmentSet().add(e);
+                e.addTrainings(this);
+            }
+        }
+    }
+
     @ManyToMany
     @JoinTable(name = "trainings_clients")
     private Set<Person> clients = new HashSet<>();

@@ -54,18 +54,58 @@ public class Person {
         return true;
     }
 
+    public void setOwningClient(Person owningClient) {
+        if (owningClient == null) {
+            this.getOwningClient().getOwnedParticipants().remove(this);
+            this.owningClient = null;
+        } else {
+            if (!owningClient.getPersonTypes().contains(PersonType.Client))
+                throw new TypeMismatchException("Given Person is not a Client");
+            this.owningClient = owningClient;
+            owningClient.getOwnedParticipants().add(this);
+        }
+    }
+
     @OneToMany(mappedBy = "owningClient")
     private Set<Person> ownedParticipants = new HashSet<>();
 
-    public void addParticipant(@NonNull Person participant) {
-        if (!participant.getPersonTypes().contains(PersonType.Participant))
-            throw new TypeMismatchException("Given Person is not a Participant");
-        if (!getPersonTypes().contains(PersonType.Client))
-            throw new TypeMismatchException("This Person object is not a Client");
-
-        getOwnedParticipants().add(participant);
-        participant.setOwningClient(this);
+    public void setOwnedParticipants(Set<Person> ownedParticipants) {
+        ownedParticipants.forEach(p -> {
+            if (!p.getPersonTypes().contains(PersonType.Participant))
+                throw new TypeMismatchException("Given Person is not a Participant");
+            if (!p.getPersonTypes().contains(PersonType.Client))
+                throw new TypeMismatchException("This Person object is not a Client");
+        });
+        this.getOwnedParticipants().forEach(p -> {
+            if (!ownedParticipants.contains(p)) p.setOwningClient(null);
+        });
+        this.ownedParticipants = ownedParticipants;
     }
+
+    // TODO: LEFT HERE
+
+    public void addParticipants(Person... ownedParticipants) {
+        for (Person p : ownedParticipants) {
+            if (!this.getOwnedParticipants().contains(p)) {
+                if (!p.getPersonTypes().contains(PersonType.Participant))
+                    throw new TypeMismatchException("Given Person is not a Participant");
+                if (!p.getPersonTypes().contains(PersonType.Client))
+                    throw new TypeMismatchException("This Person object is not a Client");
+                this.getOwnedParticipants().add(p);
+                p.setOwningClient(this);
+            }
+        }
+    }
+
+//    public void addParticipant(@NonNull Person participant) {
+//        if (!participant.getPersonTypes().contains(PersonType.Participant))
+//            throw new TypeMismatchException("Given Person is not a Participant");
+//        if (!getPersonTypes().contains(PersonType.Client))
+//            throw new TypeMismatchException("This Person object is not a Client");
+//
+//        getOwnedParticipants().add(participant);
+//        participant.setOwningClient(this);
+//    }
 
     @OneToMany(mappedBy = "client")
     private Set<Reservation> reservationsBought = new HashSet<>();
