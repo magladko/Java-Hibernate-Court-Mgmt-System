@@ -228,7 +228,7 @@ public class CourtReservationController {
                     }
                 }
 
-                // TODO: MANAGE TRAINER SELECTION CORRECTLY
+                // TODO: MANAGE TRAINER SELECTION CORRECTLY (maybe based on item selection)
 
                 trainerComboBox.getItems().addAll(availableTrainers);
                 if (trainerComboBox.getItems().contains(selected)) trainerComboBox.getSelectionModel().select(selected);
