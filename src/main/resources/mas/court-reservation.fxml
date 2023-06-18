@@ -124,7 +124,7 @@
     <Label fx:id="trainerLabel" styleClass="trainer-label" stylesheets="@style.css" text="trainerLabel" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="80.0" GridPane.columnSpan="3" GridPane.rowIndex="7">
         <children>
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#cancelReservation" text="Anuluj" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#cancelReservationProcess" text="Anuluj" />
             <Button fx:id="confirmButton" defaultButton="true" mnemonicParsing="false" onAction="#showReservationSummary" text="Podsumowanie" />
         </children>
     </HBox>

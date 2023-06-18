@@ -76,6 +76,16 @@ public class CourtRoofed extends Court {
 //        return heatingSeasonEnd;
     }
 
+    public static BigDecimal getCurrentSurcharge() {
+        // not in documentation
+        LocalDate now = LocalDate.now();
+        if (now.isBefore(getHeatingSeasonStart()) || now.isAfter(getHeatingSeasonEnd())) {
+            return BigDecimal.ZERO;
+        } else {
+            return getHeatingSurcharge();
+        }
+    }
+
     @Override
     public String getInfoTxt() {
         DateTimeFormatter df = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault());

@@ -4,12 +4,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import mas.util.DBController;
 import mas.util.Util;
 
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -88,6 +87,23 @@ public class Trainer {
                 workingHours.getEndTime().atDate(from.toLocalDate()).isAfter(from.plus(duration))) return false;
 
         return getTrainings().stream().noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()));
+    }
+
+    // outside documentation
+    public boolean isAvailable(LocalDate date) {
+        if (workingHours.containsKey(date.getDayOfWeek())) {
+            var workingHours = getWorkingHours().get(date.getDayOfWeek());
+            var courtOpeningHour = DBController.INSTANCE.getStaticStorage().getCourtOpeningHour();
+            var courtClosingHour = DBController.INSTANCE.getStaticStorage().getCourtClosingHour();
+
+            var earliestPossible = workingHours.getStartTime().isAfter(courtOpeningHour) ? workingHours.getStartTime() : courtOpeningHour;
+            var latestPossible = workingHours.getEndTime().isBefore(courtClosingHour) ? workingHours.getEndTime() : courtClosingHour;
+
+            for (int h = earliestPossible.getHour(); h < latestPossible.getHour(); h++) {
+                if (isAvailable(LocalDateTime.of(date, LocalTime.of(h, 0)), Duration.ofHours(1))) return true;
+            }
+        }
+        return false;
     }
 
     @Override

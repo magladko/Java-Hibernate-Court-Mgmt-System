@@ -9,6 +9,7 @@ import lombok.Setter;
 import mas.util.DBController;
 import mas.util.Util;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

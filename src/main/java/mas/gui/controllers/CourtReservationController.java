@@ -4,6 +4,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,17 +16,16 @@ import mas.CourtReservationApp;
 import mas.entity.Court;
 import mas.entity.Trainer;
 import mas.util.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class CourtReservationController {
 
@@ -46,64 +46,206 @@ public class CourtReservationController {
 
     private final List<TableColumn<Court, Boolean>> hourColumns = new ArrayList<>();
 
-    private final LinkedHashMap<TableColumn<Court, Boolean>, BooleanProperty> markedHours = new LinkedHashMap<>();
-
     @FXML
     protected void initialize() {
-        // Hour columns
+
+        // === AVAILABILITY TABLE ===
         availabilityTable.setDisable(true);
         availabilityTable.setSelectionModel(null);
-        availabilityTable.setFocusModel(null);
 
-        SessionData.reservationStartProperty().bind(Bindings.createObjectBinding(() -> {
-            LocalDate date = datePicker.getValue();
-            if (date == null) return null;
-            return LocalDateTime.of(date, LocalTime.MIDNIGHT);
-        }, datePicker.valueProperty()));
+        availabilityTable.setEditable(true);
 
-        SessionData.reservationDurationProperty().bind(Bindings.createObjectBinding(() -> {
-            if (availabilityTable.getItems().isEmpty()) return null;
+        courtNumberColumn.setCellValueFactory(new PropertyValueFactory<>("number"));
+        courtNumberColumn.setCellFactory(column -> new ButtonTableCell());
 
-            Court court = SessionData.courtProperty().getValue();
-            if (court == null) return Duration.ofHours(0);
-            return Duration.ofHours(court.getMarkedHours().values().stream().filter(BooleanExpression::getValue).count());
-        }, markedHours.values().toArray(new BooleanProperty[0])));
-//        }, SessionData.courtProperty().get().getMarkedHours().values().toArray(new BooleanProperty[0])));
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerHour"));
+        priceColumn.setCellFactory(list -> new MoneyFormatCell());
+
+        availabilityTable.setRowFactory(tableView -> {
+            TableRow<Court> row = new TableRow<>();
+            row.disableProperty().bind(SessionData.courtProperty().isNotNull().and(SessionData.courtProperty().isNotEqualTo(row.itemProperty())));
+            row.disabledProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null && newValue) row.getStyleClass().add("row-disabled");
+                else row.getStyleClass().remove("row-disabled");
+            });
+            return row;
+        });
+        // === END OF AVAILABILITY TABLE ===
 
 
-        totalPriceLabel.textProperty().bind(Bindings.createStringBinding(() -> {
-            // TODO: Calculate price
-            return "";
-        }, SessionData.courtProperty(), SessionData.reservationStartProperty(), SessionData.reservationDurationProperty(), SessionData.racketProperty(), SessionData.trainerProperty()));
+        SessionData.courtProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                // bind duration to marked hours
+                SessionData.reservationDurationProperty().unbind();
+                SessionData.reservationDurationProperty().bind(Bindings.createObjectBinding(() ->
+                        Duration.ofHours(newValue.getMarkedHours().values().stream()
+                                .filter(BooleanExpression::getValue).count()),
+                        newValue.getMarkedHours().values().toArray(new BooleanProperty[0])));
 
+                // bind start to first marked hour
+                SessionData.reservationStartProperty().unbind();
+                SessionData.reservationStartProperty().bind(Bindings.createObjectBinding(() -> newValue
+                        .getMarkedHours()
+                        .entrySet().stream()
+                        .filter(e -> e.getValue().get())
+                        .findFirst()
+                        .map(entry -> LocalDateTime.of(
+                                datePicker.getValue(),
+                                new HourColumnHeaderStrConv().fromString(entry.getKey().getText())))
+                        .orElseGet(() -> LocalDateTime.of(datePicker.getValue(), LocalTime.MIN)),
+                        newValue.getMarkedHours().values().toArray(new BooleanProperty[0])));
+            }
+        });
+
+        // TODO: bind racket
+
+        totalPriceLabel.textProperty().bind(Bindings.createStringBinding(
+            () -> {
+                if (SessionData.getTotalPrice().isEmpty()) return "";
+                return NumberFormat.getCurrencyInstance().format(SessionData.getTotalPrice().get());
+            },
+            SessionData.courtProperty(),
+            SessionData.reservationStartProperty(),
+            SessionData.reservationDurationProperty(),
+            SessionData.racketProperty(),
+            SessionData.trainerProperty()));
+
+        datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) return;
+            if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(newValue))){
+                datePicker.setValue(oldValue);
+            } else {
+                // On valid date change:
+                refreshAvailabilityTable();
+
+                trainerComboBox.getItems().clear();
+//                trainerReservationControlsSetup();
+                // TODO: Racket
+            }
+        });
         datePickerSetup();
 
-        trainingCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
-        racketCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
+        trainerReservationControlsSetup();
+        trainingCheckBox.selectedProperty().addListener(trainingCheckBoxSelectionListener());
 
+        racketCheckBox.disableProperty().bind(SessionData.courtProperty().isNull());
         confirmButton.disableProperty().bind(SessionData.courtProperty().isNull());
+    }
 
+    private void trainerReservationControlsSetup() {
+        trainerComboBox.getItems().clear();
+
+        trainingCheckBox.disableProperty().unbind();
+        trainingCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
+
+        trainerComboBox.disableProperty().unbind();
         trainerComboBox.disableProperty().bind(trainingCheckBox.selectedProperty().not());
+
+        SessionData.trainerProperty().unbind();
         SessionData.trainerProperty().bind(Bindings.when(trainingCheckBox.selectedProperty())
                 .then(trainerComboBox.valueProperty())
                 .otherwise((Trainer) null));
-        trainerComboBox.getItems().addAll(DBController.INSTANCE.getTrainers());
 
         trainerLabel.textProperty().bind(SessionData.trainerProperty().map(t -> new TrainerStringConverter().toString(t)));
         trainerMiscLabel.visibleProperty().bind(trainerLabel.textProperty().map(aString -> !aString.isEmpty()));
-
-
-
         trainerComboBox.setConverter(new TrainerStringConverter());
     }
 
+    @NotNull
+    private ChangeListener<Boolean> trainingCheckBoxSelectionListener() {
+        return (observable, oldValue, newValue) -> {
+            if (newValue) {
+                var selected = trainerComboBox.getSelectionModel().getSelectedItem();
+                trainerComboBox.getItems().clear();
+
+                var availableTrainers = DBController.INSTANCE.getTrainers().stream().filter(t -> t.isAvailable(datePicker.getValue())).toList();
+
+                if (availableTrainers.isEmpty()) {
+//                    trainingCheckBox.setSelected(false);
+
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Brak trenerów");
+                    alert.setHeaderText("Brak trenerów");
+
+                    alert.setContentText("Brak trenerów dostępnych w wybranym dniu");
+
+                    var change = new ButtonType("Zmień datę");
+                    var changeUC = new ButtonType("Rezerwuj trening\nzamiast kortu");
+                    var resignFromTraining = new ButtonType("Zrezygnuj z treningu", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                    alert.getButtonTypes().setAll(change, changeUC, resignFromTraining);
+
+                    Optional<ButtonType> result = alert.showAndWait();
+
+                    if (result.isPresent()) {
+                        if (result.get() == change) {
+                            // TODO: maybe fix datepicker not showing when hours are unselected
+                            if (SessionData.courtProperty().getValue() != null)
+                                SessionData.courtProperty().get().getMarkedHours().values().forEach(v -> v.set(false));
+                            datePicker.show();
+                        } else if (result.get() == changeUC) {
+                            cancelReservationProcess();
+                        } else if (result.get() == resignFromTraining) {
+                            trainingCheckBox.selectedProperty().unbind();
+                            trainingCheckBox.setSelected(false);
+                            trainingCheckBox.disableProperty().unbind();
+                            trainingCheckBox.setDisable(true);
+                        } else throw new RuntimeException("Unexpected button type");
+                    }
+                } else if (SessionData.courtProperty().getValue() != null) {
+                    List<Trainer> availableTrainersForMarkedHours = DBController.INSTANCE.getTrainers().stream()
+                            .filter(t -> t.isAvailable(SessionData.reservationStartProperty().get(), SessionData.reservationDurationProperty().get())).toList();
+
+                    if (availableTrainersForMarkedHours.isEmpty()) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Brak trenerów");
+                        alert.setHeaderText("Brak trenerów");
+
+                        alert.setContentText("Brak trenerów dostępnych w wybranych godzinach.");
+
+                        var change = new ButtonType("Wyczyść godziny");
+                        var changeUC = new ButtonType("Rezerwuj trening\nzamiast kortu");
+                        var resignFromTraining = new ButtonType("Zrezygnuj z treningu", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                        alert.getButtonTypes().setAll(change, changeUC, resignFromTraining);
+
+                        Optional<ButtonType> result = alert.showAndWait();
+
+                        if (result.isPresent()) {
+                            if (result.get() == change) {
+                                // TODO: maybe fix datepicker not showing when hours are unselected
+                                if (SessionData.courtProperty().getValue() != null)
+                                    SessionData.courtProperty().get().getMarkedHours().values().forEach(v -> v.set(false));
+                                trainerComboBox.getSelectionModel().select(0);
+//                                trainingCheckBox.setSelected(true);
+                            } else if (result.get() == changeUC) {
+                                cancelReservationProcess();
+                            } else if (result.get() == resignFromTraining) {
+                                trainingCheckBox.selectedProperty().unbind();
+                                trainingCheckBox.setSelected(false);
+                            } else throw new RuntimeException("Unexpected button type");
+                        }
+                    }
+                }
+
+                // TODO: MANAGE TRAINER SELECTION CORRECTLY
+
+                trainerComboBox.getItems().addAll(availableTrainers);
+                if (trainerComboBox.getItems().contains(selected)) trainerComboBox.getSelectionModel().select(selected);
+                else if (!trainerComboBox.getItems().isEmpty()) {
+
+                }
+//                trainerComboBox.itemsProperty()
+            }
+        };
+    }
 
     public void showReservationSummary() {
         throw new UnsupportedOperationException("Not yet implemented");
         // TODO: Implement the logic for showing the reservation summary
     }
 
-    public void cancelReservation() {
+    public void cancelReservationProcess() {
         try {
             SessionData.cancel();
             CourtReservationApp.getStage().setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(CourtReservationApp.class.getResource("start.fxml"))), 600, 400));
@@ -113,30 +255,11 @@ public class CourtReservationController {
     }
 
     private void datePickerSetup() {
-//        datePicker.setOnHidden(event -> {
-//            if (datePicker.getValue() == null) return;
-//            if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(datePicker.getValue())))
-//                datePicker.show();
-//            else {
-//                datePicker.hide();
-//                updateAvailabilityTable();
-//            }
-//        });
-
-        datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            if (DBController.INSTANCE.getCourts().stream().noneMatch(c -> c.anyAvailable(newValue))){
-                datePicker.setValue(oldValue);
-            } else {
-                updateAvailabilityTable();
-            }
-        });
-
         // disable datepicker if any hour is selected:
-        BooleanBinding anyHourSelected = Bindings.createBooleanBinding(() -> SessionData.courtProperty().get() != null && SessionData.courtProperty().get().getMarkedHours().values().stream().anyMatch(ObservableBooleanValue::get), SessionData.courtProperty());
-        datePicker.disableProperty().bind(anyHourSelected);
-
-//        datePicker.disableProperty().bind()
+        BooleanBinding anyHourOrTrainingOrRacketSelected = Bindings.createBooleanBinding(() ->
+                SessionData.courtProperty().getValue() != null || trainingCheckBox.isSelected() || racketCheckBox.isSelected(),
+                SessionData.courtProperty(), trainingCheckBox.selectedProperty(), racketCheckBox.selectedProperty());
+        datePicker.disableProperty().bind(anyHourOrTrainingOrRacketSelected);
 
         Tooltip datePickerCloudTooltip = new Tooltip("Brak dostępnych kortów");
         datePickerCloudTooltip.setShowDelay(javafx.util.Duration.seconds(0.1));
@@ -145,7 +268,6 @@ public class CourtReservationController {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-
                 if (date.isBefore(LocalDate.now().plusDays(1))) {
                     setDisable(true);
                     getStyleClass().add("past-date");
@@ -159,21 +281,10 @@ public class CourtReservationController {
         });
     }
 
-    /**
-     * Reload the availability table.
-     */
-    private void updateAvailabilityTable() {
+    private void refreshAvailabilityTable() {
 
         availabilityTable.getColumns().removeAll(hourColumns);
         availabilityTable.getItems().clear();
-
-        availabilityTable.setEditable(true);
-
-        courtNumberColumn.setCellValueFactory(new PropertyValueFactory<>("number"));
-        courtNumberColumn.setCellFactory(column -> new ButtonTableCell());
-
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerHour"));
-        priceColumn.setCellFactory(list -> new MoneyFormatCell());
 
         // create hour columns
         LocalTime startTime = Court.getOpeningHour();
@@ -191,16 +302,6 @@ public class CourtReservationController {
             hourColumns.add(hourColumn);
             availabilityTable.getColumns().add(hourColumn);
         }
-
-        availabilityTable.setRowFactory(tableView -> {
-            TableRow<Court> row = new TableRow<>();
-            row.disableProperty().bind(SessionData.courtProperty().isNotNull().and(SessionData.courtProperty().isNotEqualTo(row.itemProperty())));
-            row.disabledProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue != null && newValue) row.getStyleClass().add("row-disabled");
-                else row.getStyleClass().remove("row-disabled");
-            });
-            return row;
-        });
 
         availabilityTable.getItems().addAll(DBController.INSTANCE.getCourts());
 
@@ -221,77 +322,85 @@ public class CourtReservationController {
             Court court = cell.getTableRow().getItem();
             if (court == null) return;
 
+            // set current court if it's not set yet
             if (oldValue != null && newValue && SessionData.courtProperty().getValue() == null) SessionData.courtProperty().set(court);
-            if (oldValue != null && oldValue && !newValue && SessionData.courtProperty().get().getMarkedHours().values().stream().noneMatch(ObservableBooleanValue::get))
+
+            // unmark court if all hours are unmarked
+            if (oldValue != null && oldValue && !newValue && SessionData.courtProperty().getValue() != null &&
+                    SessionData.courtProperty().get().getMarkedHours().values().stream().noneMatch(ObservableBooleanValue::get))
                 SessionData.courtProperty().set(null);
 
-            if (!cell.disableProperty().isBound()) {
+            // continue only on initialization
+            if (cell.disableProperty().isBound()) return;
 
-                var currentHourColumnIndex = hourColumns.indexOf(column);
-                BooleanProperty previousCellValueProperty;
-                BooleanProperty nextCellValueProperty;
-                if (currentHourColumnIndex == 0) {
-                    previousCellValueProperty = new SimpleBooleanProperty();
-                    previousCellValueProperty.setValue(null);
-                } else
-                    previousCellValueProperty = court.getMarkedHours().values().toArray(new BooleanProperty[0])[currentHourColumnIndex - 1];
-                if (currentHourColumnIndex == hourColumns.size() - 1) {
-                    nextCellValueProperty = new SimpleBooleanProperty();
-                    nextCellValueProperty.setValue(null);
-                } else
-                    nextCellValueProperty = court.getMarkedHours().values().toArray(new BooleanProperty[0])[currentHourColumnIndex + 1];
+            var currentHourColumnIndex = hourColumns.indexOf(column);
+            BooleanProperty previousCellValueProperty;
+            BooleanProperty nextCellValueProperty;
+            if (currentHourColumnIndex == 0) {
+                previousCellValueProperty = new SimpleBooleanProperty();
+                previousCellValueProperty.setValue(null);
+            } else
+                previousCellValueProperty = court.getMarkedHours().values().toArray(new BooleanProperty[0])[currentHourColumnIndex - 1];
+            if (currentHourColumnIndex == hourColumns.size() - 1) {
+                nextCellValueProperty = new SimpleBooleanProperty();
+                nextCellValueProperty.setValue(null);
+            } else
+                nextCellValueProperty = court.getMarkedHours().values().toArray(new BooleanProperty[0])[currentHourColumnIndex + 1];
 
-                BooleanBinding disableAndStyleBinding = Bindings.createBooleanBinding(() -> {
-                    cell.getStyleClass().remove("disabled-hour");
-                    cell.getStyleClass().remove("unavailable-hour");
-                    cell.getStyleClass().remove("trainer-available");
+            BooleanBinding disableAndStyleBinding = Bindings.createBooleanBinding(() -> {
+                cell.getStyleClass().remove("disabled-hour");
+                cell.getStyleClass().remove("unavailable-hour");
+                cell.getStyleClass().remove("trainer-available");
 
-                    if (cell.getTableRow().getItem() == null || cell.getItem() == null) {
-                        return false;
-                    }
+                if (cell.getTableRow().getItem() == null || cell.getItem() == null) return false;
+//                if (datePicker.valueProperty().getValue() == null) {
+//                    court.getMarkedHours().values().forEach(p -> p.setValue(false));
+//                    cell.getStyleClass().add("disabled-hour");
+//                    return true;
+//                }
 
-                    var time = (new HourColumnHeaderStrConv().fromString(column.getText())).atDate(datePicker.getValue());
-                    if (!court.isAvailable(time, Duration.ofHours(1))) {
-                        cell.getStyleClass().add("unavailable-hour");
-                        return true;
-                    }
+                var time = (new HourColumnHeaderStrConv().fromString(column.getText())).atDate(datePicker.getValue());
+                if (!court.isAvailable(time, Duration.ofHours(1))) {
+                    cell.getStyleClass().add("unavailable-hour");
+                    return true;
+                }
 
-                    boolean trainerAvailableOrNull = SessionData.trainerProperty().getValue() == null;
-                    if (!trainerAvailableOrNull && SessionData.trainerProperty().get().isAvailable(time, Duration.ofHours(1))) {
-                        cell.getStyleClass().add("trainer-available");
-                        trainerAvailableOrNull = true;
-                    }
+                boolean trainerAvailableOrNull = SessionData.trainerProperty().getValue() == null;
+                if (!trainerAvailableOrNull && SessionData.trainerProperty().get().isAvailable(time, Duration.ofHours(1))) {
+                    cell.getStyleClass().add("trainer-available");
+                    trainerAvailableOrNull = true;
+                }
 
-                    if (!trainerAvailableOrNull) {
+                if (!trainerAvailableOrNull) {
+                    cell.getStyleClass().add("disabled-hour");
+                    return true;
+                }
+
+                if (SessionData.courtProperty().getValue() == null || !SessionData.courtProperty().getValue().equals(court)) {
+                    return false; // managed by row factory
+                }
+
+                int markedHours = court.getMarkedHours().values().stream().mapToInt(value -> value.get() ? 1 : 0).sum();
+                if (markedHours == 1) {
+                    if (!previousCellValueProperty.orElse(false).getValue() && !nextCellValueProperty.orElse(false).getValue() && !cell.getItem()) {
                         cell.getStyleClass().add("disabled-hour");
                         return true;
                     }
-
-                    if (SessionData.courtProperty().getValue() == null || !SessionData.courtProperty().getValue().equals(court)) {
-                        return false; // managed by row factory
-                    }
-
-                    int markedHours = court.getMarkedHours().values().stream().mapToInt(value -> value.get() ? 1 : 0).sum();
-                    if (markedHours == 1) {
-                        if (!previousCellValueProperty.orElse(false).getValue() && !nextCellValueProperty.orElse(false).getValue() && !cell.getItem()) {
-                            cell.getStyleClass().add("disabled-hour");
-                            return true;
-                        }
-                    } else if (previousCellValueProperty.getValue() || cell.getItem() || nextCellValueProperty.getValue()) {
-                        if (previousCellValueProperty.getValue() && cell.getItem() && nextCellValueProperty.getValue()) {
-                            cell.getStyleClass().add("disabled-hour");
-                            return true;
-                        }
-                    } else {
+                } else if (previousCellValueProperty.getValue() || cell.getItem() || nextCellValueProperty.getValue()) {
+                    if (previousCellValueProperty.getValue() && cell.getItem() && nextCellValueProperty.getValue()) {
                         cell.getStyleClass().add("disabled-hour");
                         return true;
                     }
+                } else {
+                    cell.getStyleClass().add("disabled-hour");
+                    return true;
+                }
 
-                    return false;
-                }, SessionData.courtProperty(), SessionData.trainerProperty(), previousCellValueProperty, nextCellValueProperty);
+                return false;
+            }, SessionData.courtProperty(), SessionData.trainerProperty(), previousCellValueProperty, nextCellValueProperty, datePicker.valueProperty());
 
-                cell.disableProperty().bind(disableAndStyleBinding);
-            }
+            cell.disableProperty().bind(disableAndStyleBinding);
+
         });
 
         return cell;
