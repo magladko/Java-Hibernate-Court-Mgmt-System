@@ -2,22 +2,17 @@ package mas.gui.controllers;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.ObjectBinding;
+import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.*;
-import javafx.beans.property.adapter.JavaBeanObjectProperty;
-import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 import javafx.beans.value.ObservableBooleanValue;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import lombok.Getter;
 import mas.CourtReservationApp;
 import mas.entity.Court;
-import mas.entity.Reservation;
 import mas.entity.Trainer;
 import mas.util.*;
 
@@ -28,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,6 +46,8 @@ public class CourtReservationController {
 
     private final List<TableColumn<Court, Boolean>> hourColumns = new ArrayList<>();
 
+    private final LinkedHashMap<TableColumn<Court, Boolean>, BooleanProperty> markedHours = new LinkedHashMap<>();
+
     @FXML
     protected void initialize() {
         // Hour columns
@@ -57,33 +55,41 @@ public class CourtReservationController {
         availabilityTable.setSelectionModel(null);
         availabilityTable.setFocusModel(null);
 
-        ReservationData.getStart().bind(Bindings.createObjectBinding(() -> {
+        SessionData.reservationStartProperty().bind(Bindings.createObjectBinding(() -> {
             LocalDate date = datePicker.getValue();
             if (date == null) return null;
             return LocalDateTime.of(date, LocalTime.MIDNIGHT);
         }, datePicker.valueProperty()));
 
+        SessionData.reservationDurationProperty().bind(Bindings.createObjectBinding(() -> {
+            if (availabilityTable.getItems().isEmpty()) return null;
+
+            Court court = SessionData.courtProperty().getValue();
+            if (court == null) return Duration.ofHours(0);
+            return Duration.ofHours(court.getMarkedHours().values().stream().filter(BooleanExpression::getValue).count());
+        }, markedHours.values().toArray(new BooleanProperty[0])));
+//        }, SessionData.courtProperty().get().getMarkedHours().values().toArray(new BooleanProperty[0])));
+
 
         totalPriceLabel.textProperty().bind(Bindings.createStringBinding(() -> {
-
-
+            // TODO: Calculate price
             return "";
-        }, ReservationData.getCourt(), ReservationData.getStart(), ReservationData.getDuration(), ReservationData.getRacket(), ReservationData.getTrainer()));
+        }, SessionData.courtProperty(), SessionData.reservationStartProperty(), SessionData.reservationDurationProperty(), SessionData.racketProperty(), SessionData.trainerProperty()));
 
         datePickerSetup();
 
         trainingCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
         racketCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
 
-        confirmButton.disableProperty().bind(ReservationData.getCourt().isNull());
+        confirmButton.disableProperty().bind(SessionData.courtProperty().isNull());
 
         trainerComboBox.disableProperty().bind(trainingCheckBox.selectedProperty().not());
-        ReservationData.getTrainer().bind(Bindings.when(trainingCheckBox.selectedProperty())
+        SessionData.trainerProperty().bind(Bindings.when(trainingCheckBox.selectedProperty())
                 .then(trainerComboBox.valueProperty())
                 .otherwise((Trainer) null));
         trainerComboBox.getItems().addAll(DBController.INSTANCE.getTrainers());
 
-        trainerLabel.textProperty().bind(ReservationData.getTrainer().map(t -> new TrainerStringConverter().toString(t)));
+        trainerLabel.textProperty().bind(SessionData.trainerProperty().map(t -> new TrainerStringConverter().toString(t)));
         trainerMiscLabel.visibleProperty().bind(trainerLabel.textProperty().map(aString -> !aString.isEmpty()));
 
 
@@ -99,7 +105,7 @@ public class CourtReservationController {
 
     public void cancelReservation() {
         try {
-            ReservationData.cancel();
+            SessionData.cancel();
             CourtReservationApp.getStage().setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(CourtReservationApp.class.getResource("start.fxml"))), 600, 400));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -127,7 +133,7 @@ public class CourtReservationController {
         });
 
         // disable datepicker if any hour is selected:
-        BooleanBinding anyHourSelected = Bindings.createBooleanBinding(() -> ReservationData.getCourt().get() != null && ReservationData.getCourt().get().getMarkedHours().values().stream().anyMatch(ObservableBooleanValue::get), ReservationData.getCourt());
+        BooleanBinding anyHourSelected = Bindings.createBooleanBinding(() -> SessionData.courtProperty().get() != null && SessionData.courtProperty().get().getMarkedHours().values().stream().anyMatch(ObservableBooleanValue::get), SessionData.courtProperty());
         datePicker.disableProperty().bind(anyHourSelected);
 
 //        datePicker.disableProperty().bind()
@@ -188,7 +194,7 @@ public class CourtReservationController {
 
         availabilityTable.setRowFactory(tableView -> {
             TableRow<Court> row = new TableRow<>();
-            row.disableProperty().bind(ReservationData.getCourt().isNotNull().and(ReservationData.getCourt().isNotEqualTo(row.itemProperty())));
+            row.disableProperty().bind(SessionData.courtProperty().isNotNull().and(SessionData.courtProperty().isNotEqualTo(row.itemProperty())));
             row.disabledProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue != null && newValue) row.getStyleClass().add("row-disabled");
                 else row.getStyleClass().remove("row-disabled");
@@ -215,9 +221,9 @@ public class CourtReservationController {
             Court court = cell.getTableRow().getItem();
             if (court == null) return;
 
-            if (oldValue != null && newValue && ReservationData.getCourt().getValue() == null) ReservationData.getCourt().set(court);
-            if (oldValue != null && oldValue && !newValue && ReservationData.getCourt().get().getMarkedHours().values().stream().noneMatch(ObservableBooleanValue::get))
-                ReservationData.getCourt().set(null);
+            if (oldValue != null && newValue && SessionData.courtProperty().getValue() == null) SessionData.courtProperty().set(court);
+            if (oldValue != null && oldValue && !newValue && SessionData.courtProperty().get().getMarkedHours().values().stream().noneMatch(ObservableBooleanValue::get))
+                SessionData.courtProperty().set(null);
 
             if (!cell.disableProperty().isBound()) {
 
@@ -250,8 +256,8 @@ public class CourtReservationController {
                         return true;
                     }
 
-                    boolean trainerAvailableOrNull = ReservationData.getTrainer().getValue() == null;
-                    if (!trainerAvailableOrNull && ReservationData.getTrainer().get().isAvailable(time, Duration.ofHours(1))) {
+                    boolean trainerAvailableOrNull = SessionData.trainerProperty().getValue() == null;
+                    if (!trainerAvailableOrNull && SessionData.trainerProperty().get().isAvailable(time, Duration.ofHours(1))) {
                         cell.getStyleClass().add("trainer-available");
                         trainerAvailableOrNull = true;
                     }
@@ -261,7 +267,7 @@ public class CourtReservationController {
                         return true;
                     }
 
-                    if (ReservationData.getCourt().getValue() == null || !ReservationData.getCourt().getValue().equals(court)) {
+                    if (SessionData.courtProperty().getValue() == null || !SessionData.courtProperty().getValue().equals(court)) {
                         return false; // managed by row factory
                     }
 
@@ -282,7 +288,7 @@ public class CourtReservationController {
                     }
 
                     return false;
-                }, ReservationData.getCourt(), ReservationData.getTrainer(), previousCellValueProperty, nextCellValueProperty);
+                }, SessionData.courtProperty(), SessionData.trainerProperty(), previousCellValueProperty, nextCellValueProperty);
 
                 cell.disableProperty().bind(disableAndStyleBinding);
             }
