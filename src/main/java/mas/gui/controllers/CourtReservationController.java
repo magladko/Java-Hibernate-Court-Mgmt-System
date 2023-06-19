@@ -1,25 +1,23 @@
 package mas.gui.controllers;
 
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableBooleanValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import mas.CourtReservationApp;
 import mas.entity.Court;
 import mas.entity.Racket;
 import mas.entity.Trainer;
 import mas.util.*;
-import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -115,9 +113,13 @@ public class CourtReservationController {
 
 
         // === RACKET RESERVATION ===
-        racketCheckBox.disableProperty().bind(SessionData.courtProperty().isNull());
-        racketComboBox.disableProperty().bind(racketCheckBox.selectedProperty().not());
-        Tooltip racketVBoxTooltip = new Tooltip("Najpierw wybierz godziny rezerwacji");
+        SessionData.courtProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) {
+                racketCheckBox.setSelected(false);
+            }
+        });
+
+        Tooltip racketVBoxTooltip = new Tooltip("Wymagane wybranie godziny rezerwacji");
         racketVBoxTooltip.setShowDelay(javafx.util.Duration.seconds(0.1));
         racketReservationVBox.setOnMouseEntered(e -> {
             if (SessionData.courtProperty().getValue() == null) Tooltip.install(racketReservationVBox, racketVBoxTooltip);
@@ -130,6 +132,7 @@ public class CourtReservationController {
             return null;
         }, racketCheckBox.selectedProperty(), racketComboBox.valueProperty()));
 
+        racketReservationControlsRefresh();
         racketCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             racketCheckBox.getStyleClass().remove("marked-racket-box");
 
@@ -139,8 +142,44 @@ public class CourtReservationController {
                     racketCheckBox.setSelected(false);
                     return;
                 }
-//                racketComboBox.getItems().setAll()
-                racketComboBox.getItems().setAll(DBController.INSTANCE.getRackets());
+                
+                var rackets = DBController.INSTANCE.getRackets();
+                var racketsToday = rackets.stream().filter(racket -> racket.isAvailable(datePicker.getValue())).toList();
+                var racketsAtTime = racketsToday.stream().filter(racket -> racket.isAvailable(
+                        SessionData.reservationStartProperty().getValue(),
+                        SessionData.reservationDurationProperty().getValue())).toList();
+
+                if (racketsAtTime.isEmpty()) {
+                    if (racketsToday.isEmpty()) {
+                        racketComboBox.getItems().clear();
+
+                        racketComboBox.setPromptText("Brak dostępnych rakiet");
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Brak dostępnych rakiet");
+                        alert.setHeaderText("Brak dostępnych rakiet");
+                        alert.setContentText("Wybranego dnia wszystkie rakiety są już wypożyczone.");
+                        alert.showAndWait();
+
+                        racketCheckBox.selectedProperty().unbind();
+                        racketCheckBox.setSelected(false);
+                        racketCheckBox.disableProperty().unbind();
+                        racketCheckBox.setDisable(true);
+                    } else {
+                        racketComboBox.getItems().setAll(racketsToday);
+
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Brak dostępnych rakiet");
+                        alert.setHeaderText("Brak dostępnych rakiet");
+                        alert.setContentText("Wszystkie rakiety są obecnie wypożyczone w wybranych godzinach.");
+
+                        alert.showAndWait();
+
+                        racketCheckBox.selectedProperty().unbind();
+                        racketCheckBox.setSelected(false);
+                    }
+                }
+
+                racketComboBox.getItems().setAll(racketsToday);
                 racketComboBox.getSelectionModel().selectFirst();
             } else {
                 racketComboBox.getItems().clear();
@@ -168,14 +207,18 @@ public class CourtReservationController {
             } else {
                 // On valid date change:
                 refreshAvailabilityTable();
-                trainerComboBox.getItems().clear();
-                racketComboBox.getItems().clear();
+                trainerReservationControlsRefresh();
+                racketReservationControlsRefresh();
             }
         });
+
         datePickerSetup();
 
+        // === TRAINER RESERVATION ===
         trainerComboBox.setConverter(new TrainerStringConverter());
-        trainerReservationControlsSetup();
+
+        trainerReservationControlsRefresh();
+
         trainingCheckBox.selectedProperty().addListener(trainingCheckBoxSelectionListener());
         trainerComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
@@ -185,24 +228,6 @@ public class CourtReservationController {
                 trainerComboBox.getSelectionModel().select(oldValue);
             }
         });
-
-        commentsTextArea.disableProperty().bind(datePicker.valueProperty().isNull());
-        SessionData.commentProperty().bind(commentsTextArea.textProperty());
-
-        confirmButton.disableProperty().bind(SessionData.courtProperty().isNull());
-
-        datePicker.show();
-    }
-
-    private void trainerReservationControlsSetup() {
-        trainerComboBox.getItems().clear();
-
-        trainingCheckBox.disableProperty().unbind();
-        trainingCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
-
-        trainerComboBox.disableProperty().unbind();
-        trainerComboBox.disableProperty().bind(trainingCheckBox.selectedProperty().not());
-
         trainerComboBox.setCellFactory(listView -> new ListCell<>() {
             @Override
             protected void updateItem(Trainer item, boolean empty) {
@@ -227,13 +252,42 @@ public class CourtReservationController {
                 }
             }
         });
+        // === END OF TRAINER RESERVATION ===
+
+        commentsTextArea.disableProperty().bind(datePicker.valueProperty().isNull());
+        SessionData.commentProperty().bind(commentsTextArea.textProperty());
+
+        commentsTextArea.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                e.consume();
+                commentsTextArea.getParent().requestFocus();
+                commentsTextArea.setText(commentsTextArea.getText().strip());
+            }
+        });
+
+        confirmButton.disableProperty().bind(SessionData.courtProperty().isNull());
+
+        datePicker.show();
+    }
+
+    private void trainerReservationControlsRefresh() {
+        trainerComboBox.getItems().clear();
+
+        trainingCheckBox.disableProperty().unbind();
+        trainingCheckBox.disableProperty().bind(datePicker.valueProperty().isNull());
+
+        trainerComboBox.disableProperty().unbind();
+        trainerComboBox.disableProperty().bind(trainingCheckBox.selectedProperty().not());
 
         SessionData.trainerProperty().unbind();
         SessionData.trainerProperty().bind(Bindings.when(trainingCheckBox.selectedProperty())
                 .then(trainerComboBox.valueProperty())
                 .otherwise((Trainer) null));
 
+        trainerLabel.textProperty().unbind();
         trainerLabel.textProperty().bind(SessionData.trainerProperty().map(t -> new TrainerStringConverter().toString(t)));
+
+        trainerMiscLabel.visibleProperty().unbind();
         trainerMiscLabel.visibleProperty().bind(trainerLabel.textProperty().map(aString -> !aString.isEmpty()));
     }
 
@@ -244,7 +298,6 @@ public class CourtReservationController {
             if (newValue) {
                 trainingCheckBox.getStyleClass().add("marked-training-box");
                 var selected = trainerComboBox.getSelectionModel().getSelectedItem();
-//                trainerComboBox.getItems().clear();
 
                 var trainers = DBController.INSTANCE.getTrainers();
                 var availableTrainers = trainers.stream().filter(t -> t.isAvailable(datePicker.getValue())).toList();
@@ -328,6 +381,17 @@ public class CourtReservationController {
                 }
             }
         };
+    }
+
+    private void racketReservationControlsRefresh() {
+        racketCheckBox.disableProperty().unbind();
+        racketCheckBox.disableProperty().bind(SessionData.courtProperty().isNull());
+
+        racketComboBox.disableProperty().unbind();
+        racketComboBox.disableProperty().bind(racketCheckBox.selectedProperty().not());
+
+
+
     }
 
     public void showReservationSummary() {

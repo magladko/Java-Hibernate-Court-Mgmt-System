@@ -105,7 +105,7 @@ public class Reservation {
         if (!court.isAvailable(start, duration))
             throw new TimeUnavailableException(court, start, duration);
 
-        return new Reservation(start, duration, court, null, participant, client, comment);
+        return new Reservation(start, duration, court, racket, participant, client, comment);
     }
 
     public static Reservation makeReservation(LocalDateTime start, Duration duration, Court court, Person client, Person participant) {

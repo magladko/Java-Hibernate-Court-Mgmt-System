@@ -5,71 +5,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<!--<?xml version="1.0" encoding="UTF-8"?>-->
-<!--<?import javafx.scene.control.*?>-->
-<!--<?import javafx.scene.layout.*?>-->
-<!--<?import java.net.URL?>-->
-<!--<?import javafx.geometry.Insets?>-->
-<!--<GridPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.CourtReservationController" alignment="CENTER" hgap="10.0" vgap="10.0">-->
-<!--    <columnConstraints>-->
-<!--        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />-->
-<!--        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />-->
-<!--        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />-->
-<!--    </columnConstraints>-->
-<!--    <rowConstraints>-->
-<!--        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />-->
-<!--        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />-->
-<!--        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />-->
-<!--        <RowConstraints vgrow="ALWAYS" />-->
-<!--        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />-->
-<!--        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />-->
-<!--        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />-->
-<!--        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />-->
-<!--    </rowConstraints>-->
-<!--    <padding>-->
-<!--        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />-->
-<!--    </padding>-->
-<!--    <Label alignment="CENTER" contentDisplay="CENTER" styleClass="title" text="Rezerwacja kortu" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />-->
-<!--    <DatePicker fx:id="datePicker" prefWidth="200.0" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />-->
-<!--    &lt;!&ndash; Filters &ndash;&gt;-->
-<!--    &lt;!&ndash; Place your filter components here &ndash;&gt;-->
-<!--    <Label text="Tabela dostępności kortów" GridPane.halignment="CENTER" GridPane.rowIndex="2" />-->
-<!--    <Label fx:id="trainerMiscLabel" text="trener: " visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />-->
-<!--    <Label fx:id="trainerLabel" styleClass="trainer-label" text="Label" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />-->
-<!--    <TableView fx:id="availabilityTable" prefHeight="200.0" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="3" GridPane.valignment="CENTER">-->
-<!--        <columns>-->
-<!--            <TableColumn fx:id="courtNumberColumn" editable="false" prefWidth="-1.0" reorderable="false" styleClass="number-column" text="Numer kortu" />-->
-<!--            <TableColumn fx:id="priceColumn" editable="false" prefWidth="60.0" reorderable="false" styleClass="price-column" text="Cena za godzinę" />-->
-<!--            &lt;!&ndash; Hour columns (programmatically) &ndash;&gt;-->
-<!--        </columns>-->
-<!--        <columnResizePolicy>-->
-<!--            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />-->
-<!--        </columnResizePolicy>-->
-<!--    </TableView>-->
-<!--    <VBox alignment="CENTER_LEFT" spacing="10.0" GridPane.rowIndex="4" GridPane.rowSpan="2">-->
-<!--        <CheckBox fx:id="trainingCheckBox" text="Zarezerwuj trening z trenerem" />-->
-<!--        <ComboBox fx:id="trainerComboBox" disable="true" prefWidth="200.0" />-->
-<!--    </VBox>-->
-<!--    <VBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.rowSpan="2" GridPane.valignment="CENTER">-->
-<!--        <CheckBox fx:id="racketCheckBox" text="Racket Reservation" />-->
-<!--        <ComboBox fx:id="racketComboBox" disable="true" prefWidth="200.0" />-->
-<!--    </VBox>-->
-<!--    <HBox alignment="CENTER_LEFT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">-->
-<!--        <Label text="Total Price:" />-->
-<!--        <Label fx:id="totalPriceLabel" text="" />-->
-<!--    </HBox>-->
-<!--    <TextArea fx:id="commentsTextArea" prefHeight="100.0" prefWidth="572.0" promptText="Dodatkowe uwagi do rezerwacji/treningu/sprzętu" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />-->
-<!--    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="80.0" GridPane.columnSpan="3" GridPane.rowIndex="7">-->
-<!--        <children>-->
-<!--            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#cancelReservation" text="Anuluj" />-->
-<!--            <Button fx:id="confirmButton" defaultButton="true" mnemonicParsing="false" onAction="#showReservationSummary" text="Podsumowanie" />-->
-<!--        </children>-->
-<!--    </HBox>-->
-<!--    <stylesheets>-->
-<!--        <URL value="@style.css" />-->
-<!--    </stylesheets>-->
-<!--</GridPane>-->
-
 <GridPane alignment="CENTER" hgap="10.0" vgap="10.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.CourtReservationController">
     <columnConstraints>
         <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
@@ -120,7 +55,12 @@
         <Label text="Total Price:" />
         <Label fx:id="totalPriceLabel" text="" />
     </HBox>
-    <TextArea fx:id="commentsTextArea" prefHeight="100.0" prefWidth="572.0" promptText="Dodatkowe uwagi do rezerwacji" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+   <VBox GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+      <children>
+         <Label text="Komentarz:" />
+          <TextArea fx:id="commentsTextArea" prefHeight="100.0" prefWidth="572.0" promptText="Dodatkowe uwagi do rezerwacji" />
+      </children>
+   </VBox>
     <Label fx:id="trainerLabel" styleClass="trainer-label" stylesheets="@style.css" text="trainerLabel" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="80.0" GridPane.columnSpan="3" GridPane.rowIndex="7">
         <children>

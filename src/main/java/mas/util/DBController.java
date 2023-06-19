@@ -134,7 +134,25 @@ public enum DBController {
                             LocalDateTime.now().plusDays(1).getDayOfMonth(), 12, 0
                     ),
                     Duration.ofHours(2),
-                    courts[1], clients.get(1), clients.get(1)));
+                    courts[1], rackets.get(0), clients.get(1), clients.get(1)));
+
+            reservations.add(Reservation.makeReservation(
+                    LocalDateTime.of(
+                            LocalDateTime.now().plusDays(1).getYear(),
+                            LocalDateTime.now().plusDays(1).getMonth(),
+                            LocalDateTime.now().plusDays(1).getDayOfMonth(), 12, 0
+                    ),
+                    Duration.ofHours(2),
+                    courts[2], rackets.get(1), clients.get(1), clients.get(1)));
+
+            reservations.add(Reservation.makeReservation(
+                    LocalDateTime.of(
+                            LocalDateTime.now().plusDays(1).getYear(),
+                            LocalDateTime.now().plusDays(1).getMonth(),
+                            LocalDateTime.now().plusDays(1).getDayOfMonth(), 12, 0
+                    ),
+                    Duration.ofHours(2),
+                    courts[3], rackets.get(2), clients.get(1), clients.get(1)));
 
             Arrays.stream(courts).forEach(c -> {
                 try {
@@ -147,6 +165,19 @@ public enum DBController {
                     System.err.println(e.getMessage());
                 }
             });
+
+            LocalDate eqFullyBookedDay = LocalDate.now().plusDays(3);
+
+            for (int r = 0; r < rackets.size(); r++) {
+                try {
+                    Reservation.makeReservation(
+                            eqFullyBookedDay.atTime(staticStorage.getCourtOpeningHour()),
+                            Duration.between(staticStorage.getCourtOpeningHour(), staticStorage.getCourtClosingHour()),
+                            courts[r], rackets.get(r), clients.get(2), clients.get(2));
+                } catch (TimeUnavailableException e) {
+                    System.err.println("For eq fully booked day: " + e.getMessage());
+                }
+            }
 
             reservations.forEach(em::persist);
 

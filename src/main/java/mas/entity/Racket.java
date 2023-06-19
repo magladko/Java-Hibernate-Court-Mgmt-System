@@ -6,11 +6,14 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import mas.util.DBController;
 import mas.util.Util;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -67,6 +70,16 @@ public class Racket extends Equipment {
     public boolean isAvailable(LocalDateTime from, Duration duration) {
         return getReservations().stream().noneMatch(r -> Util.isOverlapping(from, duration, r.getStart(), r.getDuration())) &&
                 super.isAvailable(from, duration);
+    }
+
+    public boolean isAvailable(LocalDate date) {
+        var openingHours = DBController.INSTANCE.getSS().getCourtOpeningHour();
+        var closingHours = DBController.INSTANCE.getSS().getCourtClosingHour();
+
+        for (int h = openingHours.getHour(); h < closingHours.getHour(); h++) {
+            if (isAvailable(LocalDateTime.of(date, LocalTime.of(h, 0)), Duration.ofHours(1))) return true;
+        }
+        return false;
     }
 
     public boolean makeReservation(Reservation reservation) {
