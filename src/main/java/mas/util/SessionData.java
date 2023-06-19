@@ -1,6 +1,7 @@
 package mas.util;
 
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mas.entity.*;
@@ -24,6 +25,7 @@ public class SessionData {
     /*@Getter */private static final SimpleObjectProperty<Person> participant = new SimpleObjectProperty<>(clientProperty().get()); // TODO: default to client
     /*@Getter */private static final SimpleObjectProperty<Racket> racket = new SimpleObjectProperty<>();
     /*@Getter */private static final SimpleObjectProperty<Trainer> trainer = new SimpleObjectProperty<>();
+    private static final SimpleStringProperty comment = new SimpleStringProperty();
 
     public static void cancel() {
         court.unbind();
@@ -95,5 +97,9 @@ public class SessionData {
 
     public static SimpleObjectProperty<Trainer> trainerProperty() {
         return trainer;
+    }
+
+    public static SimpleStringProperty commentProperty() {
+        return comment;
     }
 }

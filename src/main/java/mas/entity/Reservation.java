@@ -31,6 +31,9 @@ public class Reservation {
     @Column(nullable = false)
     private Boolean isPaid;
 
+    @Column
+    private String comment;
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Court court;
@@ -81,18 +84,19 @@ public class Reservation {
     }
 
     private Reservation(LocalDateTime start, Duration duration, Court court, Racket racket,
-                        Person client, Person participant) {
+                        Person client, Person participant, String comment) {
         this.start = start;
         this.duration = duration;
         setCourt(court);
         setRacket(racket);
         setParticipant(participant);
         setClient(client);
-        this.isPaid = false;
+        setIsPaid(false);
+        setComment(comment);
     }
 
     public static Reservation makeReservation(LocalDateTime start, Duration duration, Court court, Racket racket,
-                                              Person client, Person participant) throws TimeUnavailableException, TypeMismatchException {
+                                              Person client, Person participant, String comment) throws TimeUnavailableException, TypeMismatchException {
         if (!client.getPersonTypes().contains(Person.PersonType.Client))
             throw new TypeMismatchException("First argument person type is not Client.");
         if (!participant.getPersonTypes().contains(Person.PersonType.Participant))
@@ -101,20 +105,19 @@ public class Reservation {
         if (!court.isAvailable(start, duration))
             throw new TimeUnavailableException(court, start, duration);
 
-        //        court.getReservations().add(reservation);
-//        client.getReservationsBought().add(reservation);
-//        participant.getReservations().add(reservation);
-//
-//        if (racket != null) {
-//            reservation.setRacket(racket);
-//            racket.getReservations().add(reservation);
-//        }
-
-        return new Reservation(start, duration, court, null, participant, client);
+        return new Reservation(start, duration, court, null, participant, client, comment);
     }
 
     public static Reservation makeReservation(LocalDateTime start, Duration duration, Court court, Person client, Person participant) {
-        return makeReservation(start, duration, court, null, client, participant);
+        return makeReservation(start, duration, court, null, client, participant, null);
+    }
+
+    public static Reservation makeReservation(LocalDateTime start, Duration duration, Court court, Racket racket, Person client, Person participant) {
+        return makeReservation(start, duration, court, racket, client, participant, null);
+    }
+
+    public static Reservation makeReservation(LocalDateTime start, Duration duration, Court court, Person client, Person participant, String comment) {
+        return makeReservation(start, duration, court, null, client, participant, comment);
     }
 
     public BigDecimal getTotalPrice() {

@@ -3,7 +3,7 @@
     -fx-font-weight: BOLD;
 }
 
-.trainer-label {
+.trainer-label, .marked-racket-box, .marked-training-box {
     -fx-text-fill: #036500;
 }
 
@@ -22,7 +22,7 @@
     -fx-alignment: center;
 }
 
-.trainer-available {
+.trainer-available, .racket-available {
     -fx-background-color: #99ffaa;
     -fx-alignment: center;
 }

@@ -109,18 +109,18 @@
         </columnResizePolicy>
     </TableView>
     <VBox alignment="CENTER_LEFT" spacing="10.0" GridPane.rowIndex="4" GridPane.rowSpan="2">
-        <CheckBox fx:id="trainingCheckBox" text="Zarezerwuj trening z trenerem" />
+        <CheckBox fx:id="trainingCheckBox" text="Rezerwuj trenera" />
         <ComboBox fx:id="trainerComboBox" disable="true" prefWidth="200.0" />
     </VBox>
-    <VBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.rowSpan="2" GridPane.valignment="CENTER">
-        <CheckBox fx:id="racketCheckBox" text="Racket Reservation" />
+    <VBox fx:id="racketReservationVBox" alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.rowSpan="2" GridPane.valignment="CENTER">
+        <CheckBox fx:id="racketCheckBox" text="Rezerwuj rakietę" />
         <ComboBox fx:id="racketComboBox" disable="true" prefWidth="200.0" />
     </VBox>
     <HBox alignment="CENTER_LEFT" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
         <Label text="Total Price:" />
         <Label fx:id="totalPriceLabel" text="" />
     </HBox>
-    <TextArea fx:id="commentsTextArea" prefHeight="100.0" prefWidth="572.0" promptText="Dodatkowe uwagi do rezerwacji/treningu/sprzętu" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+    <TextArea fx:id="commentsTextArea" prefHeight="100.0" prefWidth="572.0" promptText="Dodatkowe uwagi do rezerwacji" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
     <Label fx:id="trainerLabel" styleClass="trainer-label" stylesheets="@style.css" text="trainerLabel" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="80.0" GridPane.columnSpan="3" GridPane.rowIndex="7">
         <children>

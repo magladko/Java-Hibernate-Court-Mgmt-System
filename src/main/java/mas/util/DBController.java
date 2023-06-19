@@ -169,4 +169,12 @@ public enum DBController {
     public StaticStorage getStaticStorage() {
         return INSTANCE.getEm().createQuery("SELECT s FROM StaticStorage s", StaticStorage.class).getSingleResult();
     }
+
+    public StaticStorage getSS() {
+        return getStaticStorage();
+    }
+
+    public List<Racket> getRackets() {
+        return INSTANCE.getEm().createQuery("SELECT r FROM Racket r", Racket.class).getResultList();
+    }
 }
