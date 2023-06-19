@@ -18,11 +18,15 @@ public class Test {
         // true: 2023-06-14T10:00PT1H[Training{start=2023-06-24T10:00, duration=PT1H, trainer=1, court=1}]
 
 //        System.out.println(Util.isOverlapping(LocalDateTime.of(2023, 6, 14, 10, 0), Duration.ofHours(1), LocalDateTime.of(2023, 6, 14, 10, 0), Duration.ofHours(1)));
-        List<String> a = new ArrayList<>();
+//        List<String> a = new ArrayList<>();
 
-        a.addAll(null);
+//        a.addAll(null);
 
-        System.out.println(a);
+//        System.out.println(a);
+
+        System.out.println(LocalDateTime.of(2023, 6, 14, 10, 0)
+                .isBefore(LocalDateTime.of(2023, 6, 14, 10, 1)));
+
 
     }
 }

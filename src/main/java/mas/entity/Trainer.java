@@ -82,11 +82,11 @@ public class Trainer {
 
     public boolean isAvailable(LocalDateTime from, Duration duration) {
         if (!workingHours.containsKey(from.getDayOfWeek())) return false;
-        WorkingHours workingHours = getWorkingHours().get(from.getDayOfWeek());
-        if (!workingHours.getStartTime().atDate(from.toLocalDate()).isBefore(from) &&
-                workingHours.getEndTime().atDate(from.toLocalDate()).isAfter(from.plus(duration))) return false;
 
-        return getTrainings().stream().noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()));
+        WorkingHours workingHours = getWorkingHours().get(from.getDayOfWeek());
+        return !workingHours.getStartTime().isAfter(from.toLocalTime()) &&
+                !workingHours.getEndTime().isBefore(from.plus(duration).toLocalTime()) &&
+                getTrainings().stream().noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()));
     }
 
     // outside documentation

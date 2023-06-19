@@ -79,11 +79,13 @@ public enum DBController {
 
             List<Trainer> trainers = List.of(
                     new Trainer("Jędrzej", "Kasztan", "423456789", "f@f.pl", Trainer.TrainerQualification.Animator, BigDecimal.valueOf(80),
-                            Map.of(DayOfWeek.SATURDAY, new WorkingHours(LocalTime.of(9, 0), LocalTime.of(17, 0)))),
+                            Map.of(DayOfWeek.SATURDAY,
+                                    new WorkingHours(LocalTime.of(9, 0), LocalTime.of(17, 0))
+                            )),
                     new Trainer("Zdzisław", "Wąski", "523456789", "xxx@f.pl", Trainer.TrainerQualification.TrainerCoach, BigDecimal.valueOf(180),
                             Map.of(
                                     DayOfWeek.SATURDAY,
-                                    new WorkingHours(LocalTime.of(9, 0), LocalTime.of(17, 0)),
+                                    new WorkingHours(LocalTime.of(15, 0), LocalTime.of(18, 0)),
                                     DayOfWeek.MONDAY,
                                     new WorkingHours(LocalTime.of(17, 0), LocalTime.of(21, 0))
                             ))
