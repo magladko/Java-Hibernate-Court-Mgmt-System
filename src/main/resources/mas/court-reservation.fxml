@@ -27,8 +27,7 @@
 
     <Label alignment="CENTER" contentDisplay="CENTER" styleClass="title" stylesheets="@style.css" text="Rezerwacja kortu" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
     <DatePicker fx:id="datePicker" prefWidth="200.0" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-    <!-- Filters -->
-    <!-- Place your filter components here -->
+
     <Label styleClass="table-title" stylesheets="@style.css" text="Tabela dostępności kortów" wrapText="true" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
     <Label fx:id="trainerMiscLabel" text="trener: " visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
     <!--    <Label fx:id="trainerLabel" minHeight="-Infinity" minWidth="-Infinity" styleClass="trainer-label" stylesheets="@style.css" text="Imię Nazwisko, stopień trenerski, CENA" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />-->
@@ -62,12 +61,12 @@
       </children>
    </VBox>
     <Label fx:id="trainerLabel" styleClass="trainer-label" stylesheets="@style.css" text="trainerLabel" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="80.0" GridPane.columnSpan="3" GridPane.rowIndex="7">
-        <children>
+   <TilePane alignment="CENTER" prefColumns="2" prefHeight="200.0" prefRows="1" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="7">
+      <children>
             <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#cancelReservationProcess" text="Anuluj" />
             <Button fx:id="confirmButton" defaultButton="true" mnemonicParsing="false" onAction="#showReservationSummary" text="Podsumowanie" />
-        </children>
-    </HBox>
+      </children>
+   </TilePane>
 
     <stylesheets>
         <URL value="@style.css" />

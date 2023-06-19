@@ -389,13 +389,17 @@ public class CourtReservationController {
 
         racketComboBox.disableProperty().unbind();
         racketComboBox.disableProperty().bind(racketCheckBox.selectedProperty().not());
-
-
-
     }
 
     public void showReservationSummary() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        try {
+            CourtReservationApp.getStage().setScene(new Scene(FXMLLoader
+                    .load(Objects.requireNonNull(CourtReservationApp.class.getResource("reservation-summary.fxml"))), -1, -1));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
         // TODO: Implement the logic for showing the reservation summary
     }
 

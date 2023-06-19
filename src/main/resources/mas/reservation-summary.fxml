@@ -3,10 +3,61 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.ReservationSummaryController">
-    <children>
-        <Label layoutX="14.0" layoutY="14.0" text="Reservation Summary" />
-        <Label fx:id="summaryLabel" layoutX="14.0" layoutY="42.0" text="Summary content" />
-        <Button layoutX="24.0" layoutY="354.0" mnemonicParsing="false" onAction="#goBackToReservation" text="Edit Reservation" />
-    </children>
-</AnchorPane>
+<GridPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.ReservationSummaryController">
+   <columnConstraints>
+      <ColumnConstraints />
+      <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
+      <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+   </rowConstraints>
+
+   <Label styleClass="title" stylesheets="@style.css" text="Rezerwacja kortu - podsumowanie" GridPane.columnSpan="2147483647" />
+   <Label text="Odbiorca rezerwacji (treningu)" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
+   <ComboBox prefWidth="150.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
+   <Label text="Data:" GridPane.rowIndex="3" />
+   <Label text="dd.mm.yyyy" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+   <Label text="Godzina:" GridPane.rowIndex="4" />
+   <Label text="hh:mm" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+   <Label text="Czas trwania:" GridPane.rowIndex="5" />
+   <Label text="hh:mm" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+   <Label text="Numer kortu:" GridPane.rowIndex="6" />
+   <Label text="*NR*" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+   <Label text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.rowSpan="4" />
+   <Label text="Trener:" GridPane.rowIndex="7" />
+   <Label text="imię nazwisko" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+   <Label text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+   <Label text="Rakieta:" GridPane.rowIndex="8" />
+   <Label text="Marka, waga" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+   <Label text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+   <Label text="SUMA" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+   <Label text="*TOATL PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="9" />
+   <TilePane alignment="CENTER" prefColumns="2" prefHeight="200.0" prefRows="1" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="10">
+      <children>
+         <Button alignment="CENTER" cancelButton="true" contentDisplay="CENTER" mnemonicParsing="false" text="Wstecz" />
+         <Button alignment="CENTER" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" text="Zatwierdź i zapłać" />
+      </children>
+   </TilePane>
+<!--   <GridPane alignment="CENTER" GridPane.columnSpan="2147483647" GridPane.rowIndex="10">-->
+<!--     <columnConstraints>-->
+<!--       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->
+<!--     </columnConstraints>-->
+<!--      <children>-->
+<!--         <Button mnemonicParsing="false" text="Zatwierdź i zapłać" GridPane.columnIndex="1" GridPane.rowIndex="9" />-->
+<!--         <Button mnemonicParsing="false" text="Wstecz" GridPane.rowIndex="9" />-->
+<!--      </children>-->
+<!--   </GridPane>-->
+
+</GridPane>
