@@ -8,7 +8,6 @@ import lombok.Setter;
 import mas.util.DBController;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -55,31 +54,27 @@ public class CourtRoofed extends Court {
     public static BigDecimal getPricePerHour() {
         return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtRoofedPricePerHour from StaticStorage ss", BigDecimal.class).getSingleResult();
-//        return pricePerHour;
     }
 
     public static BigDecimal getHeatingSurcharge() {
         return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtRoofedHeatingSurcharge from StaticStorage ss", BigDecimal.class).getSingleResult();
-//        return heatingSurcharge;
     }
 
     public static LocalDate getHeatingSeasonStart() {
         return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtRoofedHeatingSeasonStart from StaticStorage ss", LocalDate.class).getSingleResult();
-//        return heatingSeasonStart;
     }
 
     public static LocalDate getHeatingSeasonEnd() {
         return DBController.INSTANCE.getEm()
                 .createQuery("select ss.courtRoofedHeatingSeasonEnd from StaticStorage ss", LocalDate.class).getSingleResult();
-//        return heatingSeasonEnd;
     }
 
-    public static BigDecimal getCurrentSurcharge() {
+    public static BigDecimal getHeatingSurcharge(LocalDate date) {
         // not in documentation
-        LocalDate now = LocalDate.now();
-        if (now.isBefore(getHeatingSeasonStart()) || now.isAfter(getHeatingSeasonEnd())) {
+//        LocalDate date = LocalDate.now();
+        if (date.isBefore(getHeatingSeasonStart()) || date.isAfter(getHeatingSeasonEnd())) {
             return BigDecimal.ZERO;
         } else {
             return getHeatingSurcharge();

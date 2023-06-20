@@ -23,16 +23,21 @@ public class SessionData {
     /*@Getter */private static final SimpleObjectProperty<LocalDateTime> reservationStart = new SimpleObjectProperty<>();
     /*@Getter */private static final SimpleObjectProperty<Duration> reservationDuration = new SimpleObjectProperty<>();
     // TODO: Initialize with client
-    /*@Getter */private static final SimpleObjectProperty<Person> client = new SimpleObjectProperty<>(
-            DBController.INSTANCE.getEm().createQuery("FROM Person", Person.class)
-                    .getResultStream().filter(p -> p.getPersonTypes().contains(Person.PersonType.Client))
-                    .findAny().orElseThrow());
-    /*@Getter */private static final SimpleObjectProperty<Person> participant = new SimpleObjectProperty<>(clientProperty().get()); // TODO: default to client
+    /*@Getter */private static final SimpleObjectProperty<Person> client = new SimpleObjectProperty<>();
+//    = new SimpleObjectProperty<>(
+//            DBController.INSTANCE.getEm().createQuery("FROM Person", Person.class)
+//                    .getResultStream().filter(p -> p.getPersonTypes().contains(Person.PersonType.Client))
+//                    .findAny().orElseThrow());
+    /*@Getter */private static final SimpleObjectProperty<Person> participant = new SimpleObjectProperty<>();
+//        new SimpleObjectProperty<>(clientProperty().get()); // TODO: default to client
     /*@Getter */private static final SimpleObjectProperty<Racket> racket = new SimpleObjectProperty<>();
     /*@Getter */private static final SimpleObjectProperty<Trainer> trainer = new SimpleObjectProperty<>();
     private static final SimpleStringProperty comment = new SimpleStringProperty();
 
     public static void cancel() {
+        courtReservationScene = null;
+        summaryScene = null;
+
         court.unbind();
         reservationStart.unbind();
         reservationDuration.unbind();
@@ -60,7 +65,7 @@ public class SessionData {
         if (court.getValue() != null) {
             if (court.getValue() instanceof CourtRoofed)
                 totalPrice = totalPrice.add(CourtRoofed.getPricePerHour().multiply(duration))
-                                       .add(CourtRoofed.getCurrentSurcharge());
+                                       .add(CourtRoofed.getHeatingSurcharge(reservationStart.getValue().toLocalDate()));
             else if (court.getValue() instanceof CourtUnroofed)
                 totalPrice = totalPrice.add(CourtUnroofed.getPricePerHour().multiply(duration));
         }

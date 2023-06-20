@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import mas.entity.Court;
+import mas.entity.Person;
 import mas.entity.Reservation;
 import mas.util.DBController;
 
@@ -18,7 +19,17 @@ public class Main {
             DBController.INSTANCE.setEm(entityManager);
             DBController.INSTANCE.seedDb();
 
+            var client = DBController.INSTANCE.getEm().find(Person.class, 1);
 
+            System.out.println(client.getOwnedParticipants().size());
+
+            var participants = client.getOwnedParticipants().toArray(new Person[0]);
+
+            for (Person o : participants) {
+                for (Person participant : participants) {
+                    System.out.println(o + " = \n" + participant + "\n\t" + o.equals(participant));
+                }
+            }
 
 //            Court c2 = DBController.INSTANCE.getEm().find(Court.class, 2);
 //            System.out.println(" - " + c2);

@@ -3,24 +3,22 @@ package mas.gui.controllers;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.BooleanExpression;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
-import mas.CourtReservationApp;
 import mas.entity.Court;
 import mas.entity.Racket;
 import mas.entity.Trainer;
 import mas.util.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.Duration;
@@ -49,8 +47,13 @@ public class CourtReservationController {
 
     private final List<TableColumn<Court, Boolean>> hourColumns = new ArrayList<>();
 
+    private final Set<WeakChangeListener<?>> weakListenersReferenceSet = new HashSet<>();
+
     @FXML
     protected void initialize() {
+        System.out.println("INIT");
+        if (SessionData.clientProperty().getValue() == null)
+            throw new RuntimeException("Client not set for reservation UC.");
 
         // === AVAILABILITY TABLE ===
         availabilityTable.setDisable(true);
@@ -63,10 +66,16 @@ public class CourtReservationController {
 
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("pricePerHour"));
         priceColumn.setCellFactory(list -> new MoneyFormatCell());
+        priceColumn.setText(NumberFormat.getCurrencyInstance().getCurrency().getSymbol() + "/1h");
 
         availabilityTable.setRowFactory(tableView -> {
             TableRow<Court> row = new TableRow<>();
             row.disableProperty().bind(SessionData.courtProperty().isNotNull().and(SessionData.courtProperty().isNotEqualTo(row.itemProperty())));
+//            var listener = new WeakChangeListener<Boolean>((observable, oldValue, newValue) -> {
+//                if (newValue != null && newValue) row.getStyleClass().add("row-disabled");
+//                else row.getStyleClass().remove("row-disabled");
+//            });
+//            weakListenersReferenceSet.add(listener);
             row.disabledProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue != null && newValue) row.getStyleClass().add("row-disabled");
                 else row.getStyleClass().remove("row-disabled");
@@ -98,6 +107,7 @@ public class CourtReservationController {
 
             // bind start to first marked hour
             SessionData.reservationStartProperty().unbind();
+            System.out.println(datePicker.getValue());
             SessionData.reservationStartProperty().bind(Bindings.createObjectBinding(() -> newValue
                     .getMarkedHours()
                     .entrySet().stream()

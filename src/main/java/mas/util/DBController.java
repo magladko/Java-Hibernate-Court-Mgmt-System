@@ -21,10 +21,6 @@ public enum DBController {
     private EntityManager em;
 
     @Getter
-    @Setter
-    private Person client;
-
-    @Getter
     private final SimpleObjectProperty<Reservation> tempReservation = new SimpleObjectProperty<>();
 
     @Getter

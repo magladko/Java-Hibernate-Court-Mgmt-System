@@ -3,9 +3,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.ReservationSummaryController">
+<GridPane fx:id="rootGridPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.ReservationSummaryController">
    <columnConstraints>
       <ColumnConstraints />
+      <ColumnConstraints minWidth="-Infinity" />
       <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
       <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
    </columnConstraints>
@@ -18,38 +19,44 @@
       <RowConstraints minHeight="10.0" prefHeight="30.0" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+      <RowConstraints minHeight="0.0" prefHeight="30.0" />
+      <RowConstraints minHeight="0.0" prefHeight="30.0" />
+      <RowConstraints minHeight="0.0" prefHeight="30.0" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" />
    </rowConstraints>
 
-   <Label styleClass="title" stylesheets="@style.css" text="Rezerwacja kortu - podsumowanie" GridPane.columnSpan="2147483647" />
+   <Label styleClass="title" stylesheets="@style.css" text="Podsumowanie rezerwacji" GridPane.columnSpan="2147483647" />
    <Label text="Odbiorca rezerwacji (treningu)" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
-   <ComboBox prefWidth="150.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
+   <ComboBox fx:id="participantComboBox" prefWidth="150.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
    <Label text="Data:" GridPane.rowIndex="3" />
-   <Label text="dd.mm.yyyy" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+   <Label fx:id="dateValueLabel" text="dd.mm.yyyy" GridPane.columnIndex="1" GridPane.rowIndex="3" />
    <Label text="Godzina:" GridPane.rowIndex="4" />
-   <Label text="hh:mm" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+   <Label fx:id="hourValueLabel" text="hh:mm" GridPane.columnIndex="1" GridPane.rowIndex="4" />
    <Label text="Czas trwania:" GridPane.rowIndex="5" />
-   <Label text="hh:mm" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+   <Label fx:id="durationValueLabel" text="hh:mm" GridPane.columnIndex="1" GridPane.rowIndex="5" />
    <Label text="Numer kortu:" GridPane.rowIndex="6" />
-   <Label text="*NR*" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-   <Label text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.rowSpan="4" />
-   <Label text="Trener:" GridPane.rowIndex="7" />
-   <Label text="imię nazwisko" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-   <Label text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-   <Label text="Rakieta:" GridPane.rowIndex="8" />
-   <Label text="Marka, waga" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-   <Label text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-   <Label text="SUMA" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-   <Label text="*TOATL PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="9" />
-   <TilePane alignment="CENTER" prefColumns="2" prefHeight="200.0" prefRows="1" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="10">
+   <Label fx:id="courtNrValueLabel" text="*NR*" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+   <Label fx:id="reservationPriceValueLabel" text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.rowSpan="4" />
+   <Label fx:id="trainerDataLabel" text="Trener:" GridPane.rowIndex="9" />
+   <Label fx:id="trainerDataValueLabel" text="imię nazwisko" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+   <Label fx:id="trainerPriceValueLabel" text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="9" />
+   <Label fx:id="racketDataLabel" text="Rakieta:" GridPane.rowIndex="10" />
+   <Label fx:id="racketDataValueLabel" text="Marka, waga" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+   <Label fx:id="racketPriceValueLabel" text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="10" />
+   <Label text="SUMA" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+   <Label fx:id="totalPriceValueLabel" text="*TOTAL PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="11" />
+   <TilePane alignment="CENTER" prefColumns="2" prefHeight="200.0" prefRows="1" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="12">
       <children>
          <Button alignment="CENTER" cancelButton="true" contentDisplay="CENTER" mnemonicParsing="false" onAction="#goBackToReservation" text="Wstecz" />
          <Button alignment="CENTER" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" text="Zatwierdź i zapłać" />
       </children>
    </TilePane>
+   <Label fx:id="heatingSurchargeLabel" text="Dopłata grzewcza:" GridPane.columnSpan="2" GridPane.rowIndex="8" />
+   <Label fx:id="heatingSurchargeValueLabel" text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+   <Label fx:id="courtPricePerHourLabel" text="Cena kortu za 1h:" GridPane.rowIndex="7" />
+   <Label fx:id="courtPricePerHourValueLabel" text="*PRICE*" GridPane.columnIndex="1" GridPane.rowIndex="7" />
 <!--   <GridPane alignment="CENTER" GridPane.columnSpan="2147483647" GridPane.rowIndex="10">-->
 <!--     <columnConstraints>-->
 <!--       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->

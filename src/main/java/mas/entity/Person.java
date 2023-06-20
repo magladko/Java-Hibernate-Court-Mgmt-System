@@ -46,18 +46,12 @@ public class Person {
     @ManyToOne
     private Person owningClient;
 
-//    public boolean changeOwningClient(@NonNull Person newOwningClient) {
-//        if (!newOwningClient.getPersonTypes().contains(PersonType.Client)) return false;
-//        this.owningClient.getOwnedParticipants().remove(this);
-//        this.owningClient = newOwningClient;
-//        newOwningClient.addOwnedParticipants(this);
-//        return true;
-//    }
-
     public void setOwningClient(Person owningClient) {
-        if (owningClient == this.owningClient) return;
+        if (owningClient == this.getOwningClient()) return;
 
         if (owningClient == null) {
+            if (!this.getPersonTypes().contains(PersonType.Client) && this.getPersonTypes().contains(PersonType.Participant))
+                throw new TypeMismatchException("This Person object is only a Participant and must have a Client");
             this.getOwningClient().removeParticipants(this);
             this.owningClient = null;
         } else {
@@ -157,14 +151,14 @@ public class Person {
         }
     }
 
-    public void removeReservations(Reservation... reservations) {
-        for (Reservation r : reservations) {
-            if (this.getReservations().contains(r)) {
-                this.getReservations().remove(r);
-                r.setParticipant(null);
-            }
-        }
-    }
+//    public void removeReservations(Reservation... reservations) {
+//        for (Reservation r : reservations) {
+//            if (this.getReservations().contains(r)) {
+//                this.getReservations().remove(r);
+//                r.setParticipant(null);
+//            }
+//        }
+//    }
 
     @ManyToMany(mappedBy = "participants")
     private Set<Training> trainings = new HashSet<>();
@@ -219,13 +213,14 @@ public class Person {
     }
 
     private Person(PersonType[] personTypes, String name, String surname, String phoneNr, String email,
-                   LocalDate birthday) {
+                   LocalDate birthday, Person owningClient) {
         this.getPersonTypes().addAll(Arrays.asList(personTypes));
         this.name = name;
         this.surname = surname;
         this.phoneNr = phoneNr;
         this.email = email;
         this.birthday = birthday;
+        this.setOwningClient(owningClient);
     }
 
     /**
@@ -238,7 +233,7 @@ public class Person {
      */
     public static Person registerClient(String name, String surname, String phoneNr, String email) {
         return new Person(new PersonType[]{ PersonType.Client, PersonType.Participant },
-                          name, surname, phoneNr, email, null);
+                          name, surname, phoneNr, email, null, null);
     }
 
     /**
@@ -260,9 +255,7 @@ public class Person {
      * @return Newly registered participant.
      */
     public static Person registerParticipant(String name, String surname, LocalDate birthday, Person client) {
-        Person participant = new Person(new PersonType[]{ PersonType.Participant }, name, surname, null, null, birthday);
-        client.addParticipants(participant);
-        return participant;
+        return new Person(new PersonType[]{ PersonType.Participant }, name, surname, null, null, birthday, client);
     }
 
     /**
@@ -312,7 +305,8 @@ public class Person {
     }
 
     /**
-     * Register Person as Client (and Participant).
+     * Extend existing Client as new Participant (and Client).
+     * @see Person#registerAsParticipant(LocalDate)
      * @return True if Person is registered as Client (or has already been one), false otherwise.
      */
     public boolean registerAsParticipant() {
@@ -323,16 +317,16 @@ public class Person {
     public String toString() {
         if (getPersonTypes().contains(PersonType.Client) && getPersonTypes().contains(PersonType.Participant)) {
             return "Client(Participant){" +
-                    ", name='" + name + '\'' +
+                    "name='" + name + '\'' +
                     ", surname='" + surname + '\'' +
                     ", phoneNr='" + phoneNr + '\'' +
                     ", email='" + email + '\'' +
                     ", birthday=" + birthday +
-                    ", ownedParticipants=" + ownedParticipants +
+                    ", ownedParticipants=" + ownedParticipants.stream().map(p -> p.getName() + " " + p.getSurname()).toList() +
                     '}';
         } else if (getPersonTypes().contains(PersonType.Participant)) {
             return "Participant{" +
-                    ", name='" + name + '\'' +
+                    "name='" + name + '\'' +
                     ", surname='" + surname + '\'' +
                     ", birthday=" + birthday +
                     ", owningClient=" + owningClient.getId() +
