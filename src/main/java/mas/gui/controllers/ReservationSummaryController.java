@@ -21,32 +21,30 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 public class ReservationSummaryController {
-    @FXML public ComboBox<Person> participantComboBox;
-    @FXML public GridPane rootGridPane;
-    @FXML public Label dateValueLabel;
-    @FXML public Label hourValueLabel;
-    @FXML public Label durationValueLabel;
-    @FXML public Label courtNrValueLabel;
-    @FXML public Label courtPricePerHourLabel;
-    @FXML public Label courtPricePerHourValueLabel;
-    @FXML public Label heatingSurchargeLabel;
-    @FXML public Label heatingSurchargeValueLabel;
-    @FXML public Label reservationPriceValueLabel;
-    @FXML public Label trainerDataLabel;
-    @FXML public Label trainerDataValueLabel;
-    @FXML public Label trainerPriceValueLabel;
-    @FXML public Label racketDataLabel;
-    @FXML public Label racketDataValueLabel;
-    @FXML public Label racketPriceValueLabel;
-    @FXML public Label totalPriceValueLabel;
+    @FXML private ComboBox<Person> participantComboBox;
+    @FXML private GridPane rootGridPane;
+    @FXML private Label dateValueLabel;
+    @FXML private Label hourValueLabel;
+    @FXML private Label durationValueLabel;
+    @FXML private Label courtNrValueLabel;
+    @FXML private Label courtPricePerHourLabel;
+    @FXML private Label courtPricePerHourValueLabel;
+    @FXML private Label heatingSurchargeLabel;
+    @FXML private Label heatingSurchargeValueLabel;
+    @FXML private Label reservationPriceValueLabel;
+    @FXML private Label trainerDataLabel;
+    @FXML private Label trainerDataValueLabel;
+    @FXML private Label trainerPriceValueLabel;
+    @FXML private Label racketDataLabel;
+    @FXML private Label racketDataValueLabel;
+    @FXML private Label racketPriceValueLabel;
+    @FXML private Label totalPriceValueLabel;
 
     public void initialize() {
         if (SessionData.clientProperty().getValue() == null) throw new RuntimeException("Client not set");
         if (SessionData.courtProperty().getValue() == null) throw new RuntimeException("Court not set");
         if (SessionData.reservationStartProperty() == null) throw new RuntimeException("Reservation start not set");
         if (SessionData.reservationDurationProperty() == null) throw new RuntimeException("Reservation duration not set");
-
-
 
         participantComboBox.itemsProperty().bind(Bindings.createObjectBinding(() -> {
             if (SessionData.clientProperty().getValue() == null) return FXCollections.emptyObservableList();
@@ -117,7 +115,7 @@ public class ReservationSummaryController {
         racketDataLabel.visibleProperty().bind(SessionData.racketProperty().isNotNull());
 
         totalPriceValueLabel.textProperty().bind(Bindings.createStringBinding(
-                () -> NumberFormat.getCurrencyInstance().format(SessionData.getTotalPrice().orElse(BigDecimal.ZERO)),
+                () -> NumberFormat.getCurrencyInstance().format(SessionData.getTotalPrice()),
                 SessionData.courtProperty(),
                 SessionData.reservationDurationProperty(),
                 SessionData.trainerProperty(),
@@ -131,6 +129,4 @@ public class ReservationSummaryController {
             throw new RuntimeException("Court reservation scene not set");
         Util.changeScene(SessionData.getCourtReservationScene());
     }
-
-    // Define your event handlers and other methods
 }

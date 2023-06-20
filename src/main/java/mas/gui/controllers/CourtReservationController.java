@@ -186,7 +186,7 @@ public class CourtReservationController {
                 }
 
                 racketComboBox.getItems().setAll(racketsToday);
-                racketComboBox.getSelectionModel().selectFirst();
+                if (!racketComboBox.isDisabled()) racketComboBox.getSelectionModel().selectFirst();
             } else {
                 racketComboBox.getItems().clear();
             }
@@ -196,10 +196,7 @@ public class CourtReservationController {
 
         // bind price
         totalPriceLabel.textProperty().bind(Bindings.createStringBinding(
-            () -> {
-                if (SessionData.getTotalPrice().isEmpty()) return "";
-                return NumberFormat.getCurrencyInstance().format(SessionData.getTotalPrice().get());
-            },
+            () -> NumberFormat.getCurrencyInstance().format(SessionData.getTotalPrice()),
             SessionData.courtProperty(),
             SessionData.reservationStartProperty(),
             SessionData.reservationDurationProperty(),
@@ -406,6 +403,7 @@ public class CourtReservationController {
         else Util.changeScene(SessionData.getSummaryScene());
     }
 
+    @FXML
     public void cancelReservationProcess() {
         SessionData.cancel();
         weakAdapter.dispose();
@@ -454,6 +452,9 @@ public class CourtReservationController {
             TableColumn<Court, Boolean> hourColumn = new TableColumn<>(new HourColumnHeaderStrConv().toString(hour));
             hourColumn.setReorderable(false);
             hourColumn.setSortable(false);
+            hourColumn.setMinWidth(-1);
+//            hourColumn.setPrefWidth(50);
+            hourColumn.setMaxWidth(5000);
 
             hourColumn.setCellValueFactory(features -> features.getValue().getMarkedHours().get(hourColumn));
             hourColumn.setCellFactory(this::hourCellFactory);

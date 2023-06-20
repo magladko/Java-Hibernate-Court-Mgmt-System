@@ -40,8 +40,8 @@ public class CourtReservationApp extends Application {
         // TODO: Change to "start.fxml"
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("start.fxml")));
         CourtReservationApp.stage.setScene(new Scene(root, 600, 400));
-        CourtReservationApp.stage.setMinWidth(500);
-        CourtReservationApp.stage.setMinHeight(400);
+        CourtReservationApp.stage.setMinWidth(200);
+        CourtReservationApp.stage.setMinHeight(200);
         CourtReservationApp.stage.setTitle("Court reservation app");
         CourtReservationApp.stage.show();
 

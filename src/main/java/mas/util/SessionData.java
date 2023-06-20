@@ -55,9 +55,9 @@ public class SessionData {
         trainer.set(null);
     }
 
-    public static Optional<BigDecimal> getTotalPrice() {
+    public static BigDecimal getTotalPrice() {
         if (reservationStart.getValue() == null ||
-                reservationDuration.getValue() == null) return Optional.empty();
+                reservationDuration.getValue() == null) return BigDecimal.ZERO;
 
         BigDecimal totalPrice = BigDecimal.ZERO;
         BigDecimal duration = BigDecimal.valueOf(reservationDuration.getValue().toHours());
@@ -78,7 +78,7 @@ public class SessionData {
             totalPrice = totalPrice.add(trainerProperty().getValue().getPricePerHour().multiply(duration));
         }
 
-        return Optional.of(totalPrice);
+        return totalPrice;
     }
 
     public static SimpleObjectProperty<Court> courtProperty() {
