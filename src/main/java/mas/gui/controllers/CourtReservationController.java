@@ -392,24 +392,16 @@ public class CourtReservationController {
     }
 
     public void showReservationSummary() {
-        try {
-            CourtReservationApp.getStage().setScene(new Scene(FXMLLoader
-                    .load(Objects.requireNonNull(CourtReservationApp.class.getResource("reservation-summary.fxml"))), -1, -1));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (SessionData.getSummaryScene() == null) {
+            SessionData.setSummaryScene(Util.changeScene("reservation-summary.fxml"));
         }
-
-
+        else Util.changeScene(SessionData.getSummaryScene());
         // TODO: Implement the logic for showing the reservation summary
     }
 
     public void cancelReservationProcess() {
-        try {
-            SessionData.cancel();
-            CourtReservationApp.getStage().setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(CourtReservationApp.class.getResource("start.fxml"))), 600, 400));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        SessionData.cancel();
+        Util.changeScene("start.fxml");
     }
 
     private void datePickerSetup() {

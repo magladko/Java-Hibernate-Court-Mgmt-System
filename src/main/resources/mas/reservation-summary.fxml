@@ -46,7 +46,7 @@
    <Label text="*TOATL PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="9" />
    <TilePane alignment="CENTER" prefColumns="2" prefHeight="200.0" prefRows="1" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="10">
       <children>
-         <Button alignment="CENTER" cancelButton="true" contentDisplay="CENTER" mnemonicParsing="false" text="Wstecz" />
+         <Button alignment="CENTER" cancelButton="true" contentDisplay="CENTER" mnemonicParsing="false" onAction="#goBackToReservation" text="Wstecz" />
          <Button alignment="CENTER" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" text="Zatwierdź i zapłać" />
       </children>
    </TilePane>

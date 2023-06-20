@@ -2,8 +2,10 @@ package mas.util;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.Scene;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import mas.entity.*;
 
 import java.math.BigDecimal;
@@ -13,6 +15,9 @@ import java.util.Optional;
 
 @NoArgsConstructor
 public class SessionData {
+
+    @Getter @Setter private static volatile Scene courtReservationScene = null;
+    @Getter @Setter private static volatile Scene summaryScene = null;
 
     /*@Getter */private static final SimpleObjectProperty<Court> court = new SimpleObjectProperty<>();
     /*@Getter */private static final SimpleObjectProperty<LocalDateTime> reservationStart = new SimpleObjectProperty<>();

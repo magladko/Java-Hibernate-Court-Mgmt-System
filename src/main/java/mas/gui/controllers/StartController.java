@@ -7,6 +7,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import mas.CourtReservationApp;
 import mas.util.DBController;
+import mas.util.SessionData;
+import mas.util.Util;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -33,12 +35,13 @@ public class StartController {
 
     @FXML
     public void runUseCase() {
-        var stage = CourtReservationApp.getStage();
-        try {
-            stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(CourtReservationApp.class.getResource("court-reservation.fxml")))));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        SessionData.setCourtReservationScene(Util.changeScene("court-reservation.fxml"));
+//        var stage = CourtReservationApp.getStage();
+//        try {
+//            stage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(CourtReservationApp.class.getResource("court-reservation.fxml")))));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
 }
