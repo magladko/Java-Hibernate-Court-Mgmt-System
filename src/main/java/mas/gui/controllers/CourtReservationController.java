@@ -55,7 +55,6 @@ public class CourtReservationController {
 
     @FXML
     protected void initialize() {
-        System.out.println("INIT");
         if (SessionData.clientProperty().getValue() == null)
             throw new RuntimeException("Client not set for reservation UC.");
 
@@ -105,7 +104,6 @@ public class CourtReservationController {
 
             // bind start to first marked hour
             SessionData.reservationStartProperty().unbind();
-            System.out.println(datePicker.getValue());
             SessionData.reservationStartProperty().bind(Bindings.createObjectBinding(() -> newValue
                             .getMarkedHours()
                             .entrySet().stream()
