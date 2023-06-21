@@ -11,7 +11,6 @@ import mas.entity.*;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @NoArgsConstructor
 public class SessionData {
@@ -19,15 +18,13 @@ public class SessionData {
     @Getter @Setter private static volatile Scene courtReservationScene = null;
     @Getter @Setter private static volatile Scene summaryScene = null;
 
-    /*@Getter */private static final SimpleObjectProperty<Court> court = new SimpleObjectProperty<>();
-    /*@Getter */private static final SimpleObjectProperty<LocalDateTime> reservationStart = new SimpleObjectProperty<>();
-    /*@Getter */private static final SimpleObjectProperty<Duration> reservationDuration = new SimpleObjectProperty<>();
-    // TODO: Initialize with client
-    /*@Getter */private static final SimpleObjectProperty<Person> client = new SimpleObjectProperty<>();
-    /*@Getter */private static final SimpleObjectProperty<Person> participant = new SimpleObjectProperty<>();
-//        new SimpleObjectProperty<>(clientProperty().get()); // TODO: default to client
-    /*@Getter */private static final SimpleObjectProperty<Racket> racket = new SimpleObjectProperty<>();
-    /*@Getter */private static final SimpleObjectProperty<Trainer> trainer = new SimpleObjectProperty<>();
+    private static final SimpleObjectProperty<Court> court = new SimpleObjectProperty<>();
+    private static final SimpleObjectProperty<LocalDateTime> reservationStart = new SimpleObjectProperty<>();
+    private static final SimpleObjectProperty<Duration> reservationDuration = new SimpleObjectProperty<>();
+    private static final SimpleObjectProperty<Person> client = new SimpleObjectProperty<>();
+    private static final SimpleObjectProperty<Person> participant = new SimpleObjectProperty<>();
+    private static final SimpleObjectProperty<Racket> racket = new SimpleObjectProperty<>();
+    private static final SimpleObjectProperty<Trainer> trainer = new SimpleObjectProperty<>();
     private static final SimpleStringProperty comment = new SimpleStringProperty();
 
     public static void cancel() {
