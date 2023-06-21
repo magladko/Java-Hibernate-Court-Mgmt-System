@@ -53,7 +53,7 @@ public class CourtReservationApp extends Application {
         try {
 
             // TODO: remove seeding
-            DBController.INSTANCE.seedDb();
+//            DBController.INSTANCE.seedDb();
             launch(args);
 
         } finally {

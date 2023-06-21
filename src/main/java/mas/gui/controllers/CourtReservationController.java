@@ -143,6 +143,42 @@ public class CourtReservationController {
         }, racketCheckBox.selectedProperty(), racketComboBox.valueProperty()));
 
         racketReservationControlsRefresh();
+
+        // FIXME: fix racket selection (Racket can be selected even if it's not available)
+        weakAdapter.<Racket>addChangeListener(racketComboBox.getSelectionModel().selectedItemProperty(), (observable, oldValue, newValue) -> {
+            if (newValue == null) return;
+            var court = SessionData.courtProperty().getValue();
+            if (court == null) return;
+            if (!newValue.isAvailable(SessionData.reservationStartProperty().get(), SessionData.reservationDurationProperty().get())) {
+                racketComboBox.getSelectionModel().select(oldValue);
+            }
+        });
+
+        racketComboBox.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(Racket item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(new RacketStringConverter().toString(item));
+                    var court = SessionData.courtProperty().getValue();
+                    if (court != null) {
+                        itemProperty().unbind();
+                        disableProperty().bind(Bindings.createBooleanBinding(() -> {
+                            var racket = this.itemProperty().getValue();
+                            if (racket == null) return false;
+                            if (SessionData.courtProperty().getValue() == null) return false;
+                            return !racket.isAvailable(SessionData.reservationStartProperty().get(), SessionData.reservationDurationProperty().get());
+                        }, court.getMarkedHours().values().toArray(new BooleanProperty[0])));
+                    } else {
+                        disableProperty().unbind();
+                        setDisable(false);
+                    }
+                }
+            }
+        });
+
         weakAdapter.<Boolean>addChangeListener(racketCheckBox.selectedProperty(), (observable, oldValue, newValue) -> {
             racketCheckBox.getStyleClass().remove("marked-racket-box");
 
@@ -190,7 +226,10 @@ public class CourtReservationController {
                 }
 
                 racketComboBox.getItems().setAll(racketsToday);
-                if (!racketComboBox.isDisabled()) racketComboBox.getSelectionModel().selectFirst();
+                if (!racketComboBox.isDisabled()) {
+                    if (racketsAtTime.size() > 0) racketComboBox.getSelectionModel().select(racketsAtTime.get(0));
+                    else racketComboBox.getSelectionModel().selectFirst();
+                }
             } else {
                 racketComboBox.getItems().clear();
             }

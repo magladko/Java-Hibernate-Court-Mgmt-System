@@ -31,6 +31,7 @@ public class StartController {
         clientChoiceBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Person object) {
+                if (object == null) return "";
                 return object.getName() + " " + object.getSurname() + " participants: " + object.getOwnedParticipants().size();
             }
 
@@ -48,6 +49,8 @@ public class StartController {
     public void seedDbClick() {
         try {
             DBController.INSTANCE.seedDb();
+            clientChoiceBox.getItems().setAll(DBController.INSTANCE.getEm().createQuery("from Person", Person.class).getResultStream().filter(p -> p.getPersonTypes().contains(Person.PersonType.Client)).toList());
+            clientChoiceBox.getSelectionModel().selectFirst();
         } catch(Exception e) {
             seedDBButton.setDisable(true);
             messageLabel.setText("Seeding failed. Database might already contain data.");

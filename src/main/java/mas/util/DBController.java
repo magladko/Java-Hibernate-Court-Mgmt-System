@@ -166,10 +166,10 @@ public enum DBController {
 
             for (int r = 0; r < rackets.size(); r++) {
                 try {
-                    Reservation.makeReservation(
+                    reservations.add(Reservation.makeReservation(
                             eqFullyBookedDay.atTime(staticStorage.getCourtOpeningHour()),
                             Duration.between(staticStorage.getCourtOpeningHour(), staticStorage.getCourtClosingHour()),
-                            courts[r], rackets.get(r), clients.get(2), clients.get(2));
+                            courts[r], rackets.get(r), clients.get(2), clients.get(2)));
                 } catch (TimeUnavailableException e) {
                     System.err.println("For eq fully booked day: " + e.getMessage());
                 }
