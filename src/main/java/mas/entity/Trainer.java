@@ -14,12 +14,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Represents a trainer in a Tennis Courts management application.
+ */
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 public class Trainer {
 
+    /**
+     * Represents the qualifications of a trainer.
+     */
     public enum TrainerQualification {
         Animator("Animator"), Instructor("Instruktor"), TrainerCoach("Trener Coach");
 
@@ -29,6 +35,9 @@ public class Trainer {
             this.polishName = polishName;
         }
 
+        /**
+         * Returns the Polish name of the qualification.
+         */
         @Override
         public String toString() {
             return polishName;
@@ -42,16 +51,20 @@ public class Trainer {
 
     @Column(nullable = false)
     private String name;
+
     @Column(nullable = false)
     private String surname;
+
     @Column(nullable = false, unique = true)
     private String phoneNr;
+
     @Column(nullable = false, unique = true)
     private String email;
 
     @Enumerated
     @Column(nullable = false)
     private TrainerQualification qualification;
+
     @Column(nullable = false)
     private BigDecimal pricePerHour;
 
@@ -61,6 +74,11 @@ public class Trainer {
     @OneToMany(mappedBy = "trainer")
     private Set<Training> trainings = new HashSet<>();
 
+    /**
+     * Adds a training to the trainer's set of trainings.
+     *
+     * @param training The training to add.
+     */
     public void addTrainings(Training training) {
         if (!getTrainings().contains(training)) {
             getTrainings().add(training);
@@ -68,6 +86,17 @@ public class Trainer {
         }
     }
 
+    /**
+     * Creates a new trainer with the given information.
+     *
+     * @param name           The name of the trainer.
+     * @param surname        The surname of the trainer.
+     * @param phoneNr        The phone number of the trainer.
+     * @param email          The email address of the trainer.
+     * @param qualification  The qualification of the trainer.
+     * @param pricePerHour   The price per hour of the trainer.
+     * @param workingHours   The working hours of the trainer.
+     */
     public Trainer(String name, String surname, String phoneNr, String email,
                    TrainerQualification qualification, BigDecimal pricePerHour,
                    Map<DayOfWeek, WorkingHours> workingHours) {
@@ -80,8 +109,17 @@ public class Trainer {
         this.workingHours.putAll(workingHours);
     }
 
+    /**
+     * Checks if the trainer is available at the given time.
+     *
+     * @param from     The starting time to check.
+     * @param duration The duration to check.
+     * @return {@code true} if the trainer is available, {@code false} otherwise.
+     */
     public boolean isAvailable(LocalDateTime from, Duration duration) {
-        if (!workingHours.containsKey(from.getDayOfWeek())) return false;
+        if (!workingHours.containsKey(from.getDayOfWeek())) {
+            return false;
+        }
 
         WorkingHours workingHours = getWorkingHours().get(from.getDayOfWeek());
         return !workingHours.getStartTime().isAfter(from.toLocalTime()) &&
@@ -89,7 +127,12 @@ public class Trainer {
                 getTrainings().stream().noneMatch(t -> Util.isOverlapping(from, duration, t.getStart(), t.getDuration()));
     }
 
-    // outside documentation
+    /**
+     * Checks if the trainer is available on the given date.
+     *
+     * @param date The date to check.
+     * @return {@code true} if the trainer is available, {@code false} otherwise.
+     */
     public boolean isAvailable(LocalDate date) {
         if (workingHours.containsKey(date.getDayOfWeek())) {
             var workingHours = getWorkingHours().get(date.getDayOfWeek());
@@ -100,12 +143,19 @@ public class Trainer {
             var latestPossible = workingHours.getEndTime().isBefore(courtClosingHour) ? workingHours.getEndTime() : courtClosingHour;
 
             for (int h = earliestPossible.getHour(); h < latestPossible.getHour(); h++) {
-                if (isAvailable(LocalDateTime.of(date, LocalTime.of(h, 0)), Duration.ofHours(1))) return true;
+                if (isAvailable(LocalDateTime.of(date, LocalTime.of(h, 0)), Duration.ofHours(1))) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
+    /**
+     * Returns a string representation of the trainer.
+     *
+     * @return The string representation of the trainer.
+     */
     @Override
     public String toString() {
         return "Trainer{" +
