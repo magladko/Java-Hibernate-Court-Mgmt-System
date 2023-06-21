@@ -12,6 +12,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import mas.entity.Court;
 import mas.entity.Racket;
 import mas.entity.Trainer;
@@ -136,39 +137,7 @@ public class CourtReservationController {
 
         racketReservationControlsRefresh();
 
-        weakAdapter.<Racket>addChangeListener(racketComboBox.getSelectionModel().selectedItemProperty(), (observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            var court = SessionData.courtProperty().getValue();
-            if (court == null) return;
-            if (!newValue.isAvailable(SessionData.reservationStartProperty().get(), SessionData.reservationDurationProperty().get())) {
-                racketComboBox.getSelectionModel().select(oldValue);
-            }
-        });
-
-        racketComboBox.setCellFactory(listView -> new ListCell<>() {
-            @Override
-            protected void updateItem(Racket item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(new RacketStringConverter().toString(item));
-                    var court = SessionData.courtProperty().getValue();
-                    if (court != null) {
-                        itemProperty().unbind();
-                        disableProperty().bind(Bindings.createBooleanBinding(() -> {
-                            var racket = this.itemProperty().getValue();
-                            if (racket == null) return false;
-                            if (SessionData.courtProperty().getValue() == null) return false;
-                            return !racket.isAvailable(SessionData.reservationStartProperty().get(), SessionData.reservationDurationProperty().get());
-                        }, court.getMarkedHours().values().toArray(new BooleanProperty[0])));
-                    } else {
-                        disableProperty().unbind();
-                        setDisable(false);
-                    }
-                }
-            }
-        });
+        customComboBoxSetup(racketComboBox, new RacketStringConverter());
 
         weakAdapter.<Boolean>addChangeListener(racketCheckBox.selectedProperty(), (observable, oldValue, newValue) -> {
             racketCheckBox.getStyleClass().remove("marked-racket-box");
@@ -258,39 +227,8 @@ public class CourtReservationController {
 
         weakAdapter.addChangeListener(trainingCheckBox.selectedProperty(), trainingCheckBoxSelectionListener());
 
-        weakAdapter.<Trainer>addChangeListener(trainerComboBox.getSelectionModel().selectedItemProperty(), (observable, oldValue, newValue) -> {
-            if (newValue == null) return;
-            var court = SessionData.courtProperty().getValue();
-            if (court == null) return;
-            if (!newValue.isAvailable(SessionData.reservationStartProperty().get(), SessionData.reservationDurationProperty().get())) {
-                trainerComboBox.getSelectionModel().select(oldValue);
-            }
-        });
+        customComboBoxSetup(trainerComboBox, new TrainerStringConverter());
 
-        trainerComboBox.setCellFactory(listView -> new ListCell<>() {
-            @Override
-            protected void updateItem(Trainer item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(new TrainerStringConverter().toString(item));
-                    var court = SessionData.courtProperty().getValue();
-                    if (court != null) {
-                        itemProperty().unbind();
-                        disableProperty().bind(Bindings.createBooleanBinding(() -> {
-                            var trainer = this.itemProperty().getValue();
-                            if (trainer == null) return false;
-                            if (SessionData.courtProperty().getValue() == null) return false;
-                            return !trainer.isAvailable(SessionData.reservationStartProperty().get(), SessionData.reservationDurationProperty().get());
-                        }, court.getMarkedHours().values().toArray(new BooleanProperty[0])));
-                    } else {
-                        disableProperty().unbind();
-                        setDisable(false);
-                    }
-                }
-            }
-        });
         // === END OF TRAINER RESERVATION ===
 
         commentsTextArea.disableProperty().bind(datePicker.valueProperty().isNull());
@@ -307,6 +245,58 @@ public class CourtReservationController {
         confirmButton.disableProperty().bind(SessionData.courtProperty().isNull());
 
         datePicker.show();
+    }
+
+    private <T>void customComboBoxSetup(ComboBox<T> comboBox, StringConverter<T> converter) {
+        weakAdapter.addChangeListener(comboBox.getSelectionModel().selectedItemProperty(), (observable, oldValue, newValue) -> {
+            if (newValue == null) return;
+            var court = SessionData.courtProperty().getValue();
+            if (court == null) return;
+            if (newValue instanceof Trainer trainerNewValue) {
+                if (!trainerNewValue.isAvailable(SessionData.reservationStartProperty().get(), SessionData.reservationDurationProperty().get())) {
+                    comboBox.getSelectionModel().select(oldValue);
+                }
+            } else if (newValue instanceof Racket racketNewValue) {
+                if (!racketNewValue.isAvailable(SessionData.reservationStartProperty().get(), SessionData.reservationDurationProperty().get())) {
+                    comboBox.getSelectionModel().select(oldValue);
+                }
+            }
+        });
+
+        comboBox.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(T item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(converter.toString(item));
+
+                    var court = SessionData.courtProperty().getValue();
+                    if (court != null) {
+                        itemProperty().unbind();
+                        disableProperty().bind(Bindings.createBooleanBinding(() -> {
+                            var itemValue = this.itemProperty().getValue();
+                            if (itemValue == null) return false;
+                            if (SessionData.courtProperty().getValue() == null) return false;
+
+                            if (itemValue instanceof Trainer trainerItemValue) {
+                                return !trainerItemValue.isAvailable(SessionData.reservationStartProperty().get(),
+                                        SessionData.reservationDurationProperty().get());
+                            } else if (itemValue instanceof Racket racketItemValue) {
+                                return !racketItemValue.isAvailable(SessionData.reservationStartProperty().get(),
+                                        SessionData.reservationDurationProperty().get());
+                            }
+
+                            throw new UnsupportedOperationException("Unsupported type: " + itemValue.getClass().getName());
+                        }, court.getMarkedHours().values().toArray(new BooleanProperty[0])));
+                    } else {
+                        disableProperty().unbind();
+                        setDisable(false);
+                    }
+                }
+            }
+        });
     }
 
     private void trainerReservationControlsRefresh() {
