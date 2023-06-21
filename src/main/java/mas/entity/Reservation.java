@@ -34,6 +34,18 @@ public class Reservation {
     @Column
     private String comment;
 
+    public void setComment(String comment) {
+        if (comment == null) {
+            this.comment = null;
+            return;
+        }
+
+        comment = comment.trim();
+        if (comment.isEmpty()) comment = null;
+
+        this.comment = comment;
+    }
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Court court;

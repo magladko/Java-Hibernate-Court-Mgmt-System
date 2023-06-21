@@ -1,62 +1,163 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane fx:id="rootGridPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.ReservationSummaryController">
+<GridPane fx:id="rootGridPane" alignment="CENTER" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mas.gui.controllers.ReservationSummaryController">
    <columnConstraints>
       <ColumnConstraints />
-      <ColumnConstraints minWidth="-Infinity" />
-      <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
-      <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
+      <ColumnConstraints />
+      <ColumnConstraints />
    </columnConstraints>
    <rowConstraints>
+      <RowConstraints minHeight="-Infinity" />
+      <RowConstraints minHeight="-Infinity" />
       <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="0.0" prefHeight="30.0" />
-      <RowConstraints minHeight="0.0" prefHeight="30.0" />
-      <RowConstraints minHeight="0.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" />
+      <RowConstraints minHeight="-Infinity" />
+      <RowConstraints minHeight="-Infinity" />
+      <RowConstraints minHeight="-Infinity" />
+      <RowConstraints minHeight="-Infinity" />
+      <RowConstraints minHeight="-Infinity" />
    </rowConstraints>
 
-   <Label styleClass="title" stylesheets="@style.css" text="Podsumowanie rezerwacji" GridPane.columnSpan="2147483647" />
-   <Label text="Odbiorca rezerwacji (treningu)" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
-   <ComboBox fx:id="participantComboBox" prefWidth="150.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
-   <Label text="Data:" GridPane.rowIndex="3" />
-   <Label fx:id="dateValueLabel" text="dd.mm.yyyy" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-   <Label text="Godzina:" GridPane.rowIndex="4" />
-   <Label fx:id="hourValueLabel" text="hh:mm" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-   <Label text="Czas trwania:" GridPane.rowIndex="5" />
-   <Label fx:id="durationValueLabel" text="hh:mm" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-   <Label text="Numer kortu:" GridPane.rowIndex="6" />
-   <Label fx:id="courtNrValueLabel" text="*NR*" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-   <Label fx:id="reservationPriceValueLabel" text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.rowSpan="4" />
-   <Label fx:id="trainerDataLabel" text="Trener:" GridPane.rowIndex="9" />
-   <Label fx:id="trainerDataValueLabel" text="imię nazwisko" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-   <Label fx:id="trainerPriceValueLabel" text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="9" />
-   <Label fx:id="racketDataLabel" text="Rakieta:" GridPane.rowIndex="10" />
-   <Label fx:id="racketDataValueLabel" text="Marka, waga" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-   <Label fx:id="racketPriceValueLabel" text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="10" />
-   <Label text="SUMA" GridPane.columnIndex="1" GridPane.rowIndex="11" />
-   <Label fx:id="totalPriceValueLabel" text="*TOTAL PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="11" />
-   <TilePane alignment="CENTER" prefColumns="2" prefHeight="200.0" prefRows="1" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="12">
+   <Label alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" styleClass="title" stylesheets="@style.css" text="Podsumowanie rezerwacji" wrapText="true" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER">
+      <GridPane.margin>
+         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </GridPane.margin></Label>
+   <TilePane alignment="CENTER" orientation="VERTICAL" prefColumns="1" prefRows="2" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+      <children>
+         <Label text="Odbiorca rezerwacji (treningu)" />
+         <ComboBox fx:id="participantComboBox" />
+      </children>
+      <padding>
+         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
+   </TilePane>
+   <GridPane hgap="10.0" styleClass="solid-border" stylesheets="@style.css" vgap="5.0" GridPane.columnSpan="2" GridPane.rowIndex="2">
+      <columnConstraints>
+         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      </rowConstraints>
+      <children>
+         <Label text="Data:" />
+         <Label fx:id="dateValueLabel" text="dd.mm.yyyy" GridPane.columnIndex="1" />
+         <Label text="Godzina:" GridPane.rowIndex="1" />
+         <Label fx:id="hourValueLabel" text="hh:mm" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         <Label text="Czas trwania:" GridPane.rowIndex="2" />
+         <Label fx:id="durationValueLabel" text="hh:mm" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+         <Label text="Numer kortu:" GridPane.rowIndex="3" />
+         <Label fx:id="courtNrValueLabel" text="*NR*" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+         <Label fx:id="courtPricePerHourLabel" text="Cena kortu za 1h:" GridPane.rowIndex="4" />
+         <Label fx:id="courtPricePerHourValueLabel" text="*PRICE*" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+      </children>
+      <padding>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
+   </GridPane>
+   <BorderPane styleClass="solid-border" stylesheets="@style.css" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+      <center>
+         <Label fx:id="reservationPriceValueLabel" text="*PRICE*" BorderPane.alignment="CENTER" />
+      </center>
+      <GridPane.margin>
+         <Insets />
+      </GridPane.margin>
+      <padding>
+         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
+   </BorderPane>
+   <GridPane styleClass="solid-border" stylesheets="@style.css" GridPane.columnSpan="2" GridPane.rowIndex="4">
+      <columnConstraints>
+         <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" />
+         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints vgrow="SOMETIMES" />
+      </rowConstraints>
+      <children>
+         <Label fx:id="trainerDataLabel" disable="true" text="Trener:" />
+         <Label fx:id="trainerDataValueLabel" alignment="CENTER_RIGHT" disable="true" text="niewybrano" GridPane.columnIndex="1" />
+      </children>
+   </GridPane>
+   <BorderPane styleClass="solid-border" stylesheets="@style.css" GridPane.columnIndex="2" GridPane.rowIndex="4">
+      <center>
+         <Label fx:id="trainerPriceValueLabel" disable="true" text="*PRICE*" />
+      </center>
+   </BorderPane>
+   <GridPane styleClass="solid-border" stylesheets="@style.css" GridPane.columnSpan="2" GridPane.rowIndex="5">
+      <columnConstraints>
+         <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" />
+         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints vgrow="SOMETIMES" />
+      </rowConstraints>
+      <children>
+         <Label fx:id="racketDataLabel" disable="true" text="Rakieta:" />
+         <Label fx:id="racketDataValueLabel" alignment="CENTER_RIGHT" disable="true" text="niewybrano" GridPane.columnIndex="1" />
+      </children>
+   </GridPane>
+   <BorderPane styleClass="solid-border" stylesheets="@style.css" GridPane.columnIndex="2" GridPane.rowIndex="5">
+      <center>
+         <Label fx:id="racketPriceValueLabel" disable="true" text="*PRICE*" />
+      </center>
+   </BorderPane>
+   <BorderPane GridPane.columnIndex="1" GridPane.rowIndex="6">
+      <right>
+         <Label style="-fx-font-weight: bold;" text="SUMA" BorderPane.alignment="CENTER">
+            <padding>
+               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+         </Label>
+      </right>
+   </BorderPane>
+   <BorderPane GridPane.columnIndex="2" GridPane.rowIndex="6">
+      <center>
+         <Label fx:id="totalPriceValueLabel" style="-fx-font-weight: bold;" text="*TOTAL PRICE*" />
+      </center>
+      <padding>
+         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
+   </BorderPane>
+   <GridPane alignment="CENTER" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER">
+      <columnConstraints>
+         <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="-Infinity" />
+         <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="-Infinity" />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      </rowConstraints>
       <children>
          <Button alignment="CENTER" cancelButton="true" contentDisplay="CENTER" mnemonicParsing="false" onAction="#goBackToReservation" text="Wstecz" />
-         <Button alignment="CENTER" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" text="Zatwierdź i zapłać" />
+         <Button alignment="CENTER" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#confirmReservation" text="Zatwierdź i zapłać" GridPane.columnIndex="1" />
+      </children>
+      <padding>
+         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+      </padding>
+   </GridPane>
+   <BorderPane styleClass="solid-border" stylesheets="@style.css" GridPane.columnIndex="2" GridPane.rowIndex="3">
+      <center>
+         <Label fx:id="heatingSurchargeValueLabel" disable="true" text="*PRICE*" />
+      </center>
+   </BorderPane>
+   <TilePane alignment="CENTER_LEFT" prefColumns="1" prefRows="1" styleClass="solid-border" stylesheets="@style.css" GridPane.columnSpan="2" GridPane.rowIndex="3">
+      <children>
+         <Label fx:id="heatingSurchargeLabel" disable="true" text="Dopłata grzewcza:" />
       </children>
    </TilePane>
-   <Label fx:id="heatingSurchargeLabel" text="Dopłata grzewcza:" GridPane.columnSpan="2" GridPane.rowIndex="8" />
-   <Label fx:id="heatingSurchargeValueLabel" text="*PRICE*" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-   <Label fx:id="courtPricePerHourLabel" text="Cena kortu za 1h:" GridPane.rowIndex="7" />
-   <Label fx:id="courtPricePerHourValueLabel" text="*PRICE*" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
 <!--   <GridPane alignment="CENTER" GridPane.columnSpan="2147483647" GridPane.rowIndex="10">-->
 <!--     <columnConstraints>-->
 <!--       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />-->

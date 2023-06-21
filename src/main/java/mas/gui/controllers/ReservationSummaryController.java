@@ -1,24 +1,22 @@
 package mas.gui.controllers;
 
+import jakarta.persistence.RollbackException;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-import mas.entity.CourtRoofed;
-import mas.entity.CourtUnroofed;
-import mas.entity.Person;
+import mas.entity.*;
+import mas.util.DBController;
 import mas.util.ParticipantComboBoxStringConverter;
 import mas.util.SessionData;
 import mas.util.Util;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Locale;
 
 public class ReservationSummaryController {
     @FXML private ComboBox<Person> participantComboBox;
@@ -57,70 +55,136 @@ public class ReservationSummaryController {
         participantComboBox.getSelectionModel().selectFirst();
         participantComboBox.setConverter(new ParticipantComboBoxStringConverter());
 
-        dateValueLabel.textProperty().bind(SessionData.reservationStartProperty().map(v -> v == null ? "" : v.toLocalDate().toString()));
+        dateValueLabel.textProperty().bind(SessionData.reservationStartProperty().map(v -> v.toLocalDate().toString()));
 
-        hourValueLabel.textProperty().bind(SessionData.reservationStartProperty().map(v -> v == null ? "" : v.toLocalTime().toString()));
+        hourValueLabel.textProperty().bind(SessionData.reservationStartProperty().map(v -> v.toLocalTime().toString()));
 
-        durationValueLabel.textProperty().bind(SessionData.reservationDurationProperty().map(d -> d == null ? "" : String.format("%02d:%02dh", d.toHours(), d.toMinutesPart())));
+        durationValueLabel.textProperty().bind(SessionData.reservationDurationProperty().map(d -> String.format("%02d:%02dh", d.toHours(), d.toMinutesPart())));
 
-        courtNrValueLabel.textProperty().bind(SessionData.courtProperty().map(v -> v == null ? "" : v.getNumber().toString()));
+        courtNrValueLabel.textProperty().bind(SessionData.courtProperty().map(v -> v.getNumber().toString()));
 
         courtPricePerHourValueLabel.textProperty().bind(SessionData.courtProperty().map(court -> {
-            if (court == null) return "";
             if (court instanceof CourtRoofed) return NumberFormat.getCurrencyInstance().format(CourtRoofed.getPricePerHour());
             if (court instanceof CourtUnroofed) return NumberFormat.getCurrencyInstance().format(CourtUnroofed.getPricePerHour());
             throw new RuntimeException("Unknown court type");
         }));
         courtPricePerHourLabel.setText("Kort (" + NumberFormat.getCurrencyInstance().getCurrency().getSymbol() + "/h):");
 
-        heatingSurchargeValueLabel.textProperty().bind(SessionData.courtProperty().map(court -> {
-            if (court == null) return "";
-            if (SessionData.reservationStartProperty().get() == null) return "";
-            if (court instanceof CourtRoofed)
-                return NumberFormat.getCurrencyInstance().format(CourtRoofed.getHeatingSurcharge(SessionData.reservationStartProperty().get().toLocalDate()));
-            return "";
-        }));
-        heatingSurchargeLabel.visibleProperty().bind(heatingSurchargeValueLabel.textProperty().isNotEmpty());
-
-
         reservationPriceValueLabel.textProperty().bind(SessionData.reservationDurationProperty().map(duration -> {
-            if (duration == null) return "";
-            if (SessionData.courtProperty().getValue() == null) return "";
+            var court = SessionData.courtProperty().getValue();
+            if (court == null) return "Court not set!";
             var hours = duration.toHours();
             BigDecimal pricePerHour;
-            if (SessionData.courtProperty().getValue() instanceof CourtRoofed) pricePerHour = CourtRoofed.getPricePerHour();
-            else if (SessionData.courtProperty().getValue() instanceof CourtUnroofed) pricePerHour = CourtUnroofed.getPricePerHour();
-            else throw new RuntimeException("Unknown court type");
+            if (court instanceof CourtRoofed) pricePerHour = CourtRoofed.getPricePerHour();
+            else if (court instanceof CourtUnroofed) pricePerHour = CourtUnroofed.getPricePerHour();
+            else throw new IllegalStateException("Unknown court type");
             return NumberFormat.getCurrencyInstance().format(pricePerHour.multiply(BigDecimal.valueOf(hours)));
         }));
 
-        trainerDataValueLabel.textProperty().bind(SessionData.trainerProperty().map(trainer -> {
-            if (trainer == null) return "";
-            return trainer.getName() + " " + trainer.getSurname();
-        }));
-        trainerPriceValueLabel.textProperty().bind(SessionData.trainerProperty().map(trainer -> {
-            if (trainer == null) return "";
-            return NumberFormat.getCurrencyInstance().format(trainer.getPricePerHour());
-        }));
-        trainerDataLabel.visibleProperty().bind(SessionData.trainerProperty().isNotNull());
+        heatingSurchargeValueLabel.textProperty().bind(SessionData.courtProperty().map(court -> {
+            String zero = NumberFormat.getCurrencyInstance().format(0);
+            if (SessionData.reservationStartProperty().get() == null) return "Start not set!";
+            if (court instanceof CourtRoofed)
+                return NumberFormat.getCurrencyInstance().format(CourtRoofed.getHeatingSurcharge(SessionData.reservationStartProperty().get().toLocalDate()));
+            return zero;
+        }).orElse(NumberFormat.getCurrencyInstance().format(0)));
 
-        racketDataValueLabel.textProperty().bind(SessionData.racketProperty().map(racket -> {
-            if (racket == null) return "";
-            return racket.getManufacturer() + ", " + new DecimalFormat("#,###0").format(racket.getWeight()) + "g";
-        }));
-        racketPriceValueLabel.textProperty().bind(SessionData.racketProperty().map(racket -> {
-            if (racket == null) return "";
-            return NumberFormat.getCurrencyInstance().format(racket.getPricePerHour());
-        }));
-        racketDataLabel.visibleProperty().bind(SessionData.racketProperty().isNotNull());
+        heatingSurchargeValueLabel.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+            var court = SessionData.courtProperty().getValue();
+            var start = SessionData.reservationStartProperty().getValue();
+            if (court == null || start == null) return true;
+
+            var text = heatingSurchargeValueLabel.textProperty().getValue();
+            if (text == null) return true;
+            return text.equals(NumberFormat.getCurrencyInstance().format(0));
+        }, SessionData.courtProperty(), SessionData.reservationStartProperty(), heatingSurchargeValueLabel.textProperty()));
+        heatingSurchargeLabel.disableProperty().bind(heatingSurchargeValueLabel.disabledProperty());
+
+        trainerDataValueLabel.textProperty().bind(SessionData.trainerProperty()
+                .map(trainer -> trainer.getName() + " " + trainer.getSurname())
+                .orElse("niewybrano"));
+        trainerPriceValueLabel.textProperty().bind(SessionData.trainerProperty()
+                .map(trainer -> NumberFormat.getCurrencyInstance().format(trainer.getPricePerHour()))
+                .orElse(NumberFormat.getCurrencyInstance().format(0)));
+
+        trainerDataValueLabel.disableProperty().bind(trainerDataValueLabel.textProperty().isEqualTo("niewybrano"));
+        trainerPriceValueLabel.disableProperty().bind(trainerDataValueLabel.disableProperty());
+        trainerDataLabel.disableProperty().bind(trainerDataValueLabel.disableProperty());
+
+        racketDataValueLabel.textProperty().bind(SessionData.racketProperty()
+                .map(racket -> racket.getManufacturer() + ", " + new DecimalFormat("#,###0").format(racket.getWeight()) + "g")
+                .orElse("niewybrano"));
+        racketPriceValueLabel.textProperty().bind(SessionData.racketProperty()
+                .map(racket -> NumberFormat.getCurrencyInstance().format(racket.getPricePerHour()))
+                .orElse(NumberFormat.getCurrencyInstance().format(0)));
+        racketDataValueLabel.disableProperty().bind(racketDataValueLabel.textProperty().isEqualTo("niewybrano"));
+        racketPriceValueLabel.disableProperty().bind(racketDataValueLabel.disableProperty());
+        racketDataLabel.disableProperty().bind(racketDataValueLabel.disableProperty());
 
         totalPriceValueLabel.textProperty().bind(Bindings.createStringBinding(
                 () -> NumberFormat.getCurrencyInstance().format(SessionData.getTotalPrice()),
                 SessionData.courtProperty(),
+                SessionData.reservationStartProperty(),
                 SessionData.reservationDurationProperty(),
                 SessionData.trainerProperty(),
                 SessionData.racketProperty()));
 
+    }
+
+    @FXML
+    public void confirmReservation() {
+
+        try {
+
+            var participant = SessionData.participantProperty().getValue() == null ?
+                    SessionData.clientProperty().getValue()
+                    : SessionData.participantProperty().getValue();
+
+            DBController.INSTANCE.getEm().getTransaction().begin();
+            if (SessionData.trainerProperty().getValue() != null) {
+                var training = Training.makeReservation(
+                        SessionData.clientProperty().getValue(),
+                        participant,
+                        SessionData.trainerProperty().getValue(),
+                        SessionData.courtProperty().getValue(),
+                        SessionData.reservationStartProperty().getValue(),
+                        SessionData.reservationDurationProperty().getValue()
+                );
+
+                if (SessionData.racketProperty().getValue() != null)
+                    training.addEquipment(SessionData.racketProperty().getValue());
+
+                DBController.INSTANCE.getEm().persist(training);
+            } else {
+                var reservation = Reservation.makeReservation(
+                        SessionData.reservationStartProperty().getValue(),
+                        SessionData.reservationDurationProperty().getValue(),
+                        SessionData.courtProperty().getValue(),
+                        SessionData.racketProperty().getValue(),
+                        SessionData.clientProperty().getValue(),
+                        participant,
+                        SessionData.commentProperty().getValue()
+                );
+                DBController.INSTANCE.getEm().persist(reservation);
+            }
+
+            DBController.INSTANCE.getEm().getTransaction().commit();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Potwierdzenie rezerwacji");
+            alert.setHeaderText("Rezerwacja została potwierdzona");
+            alert.setContentText("Rezerwacja została pomyślnie zarejestrowana w systemie.");
+            alert.showAndWait();
+        } catch (RollbackException | IllegalStateException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Błąd");
+            alert.setHeaderText("Wystąpił błąd podczas rezerwacji");
+            alert.setContentText("Wystąpił błąd podczas rezerwacji. Spróbuj ponownie.");
+            alert.showAndWait();
+        }
+
+        SessionData.cancel();
+        Util.changeScene("start.fxml");
     }
 
     @FXML

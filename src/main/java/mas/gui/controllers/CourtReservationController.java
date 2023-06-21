@@ -4,6 +4,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
@@ -12,6 +14,7 @@ import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -30,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 public class CourtReservationController {
 
@@ -398,7 +402,7 @@ public class CourtReservationController {
 
     public void showReservationSummary() {
         if (SessionData.getSummaryScene() == null) {
-            SessionData.setSummaryScene(Util.changeScene("reservation-summary.fxml"));
+            SessionData.setSummaryScene(Util.changeScene("reservation-summary.fxml", -1, -1));
         }
         else Util.changeScene(SessionData.getSummaryScene());
     }
@@ -538,9 +542,13 @@ public class CourtReservationController {
                                 return true;
                             }
                         }
+                        if (SessionData.courtProperty().getValue() == null) {
+                            return false;
+                        }
 
-                        if (SessionData.courtProperty().getValue() == null || !SessionData.courtProperty().getValue().equals(rowCourt)) {
-                            return false; // managed by row factory
+                        if (!SessionData.courtProperty().get().equals(rowCourt)) {
+                            cell.getStyleClass().add("disabled-hour");
+                            return true;
                         }
 
                         // assure that all marked hours are neighbours
@@ -561,8 +569,11 @@ public class CourtReservationController {
                         }
 
                         return false;
-                    }, SessionData.courtProperty(), SessionData.trainerProperty(), SessionData.racketProperty(), racketCheckBox.selectedProperty(),
-                    previousCellValueProperty, nextCellValueProperty, datePicker.valueProperty(), availabilityTable.onScrollToProperty(), availabilityTable.onScrollToColumnProperty());
+                    }, SessionData.courtProperty(), SessionData.trainerProperty(),
+                    SessionData.racketProperty(), racketCheckBox.selectedProperty(),
+                    previousCellValueProperty, nextCellValueProperty,
+                    datePicker.valueProperty(), availabilityTable.onScrollToProperty(),
+                    availabilityTable.onScrollToColumnProperty());
 
             cell.disableProperty().bind(disableAndStyleBinding);
 

@@ -24,10 +24,6 @@ public class SessionData {
     /*@Getter */private static final SimpleObjectProperty<Duration> reservationDuration = new SimpleObjectProperty<>();
     // TODO: Initialize with client
     /*@Getter */private static final SimpleObjectProperty<Person> client = new SimpleObjectProperty<>();
-//    = new SimpleObjectProperty<>(
-//            DBController.INSTANCE.getEm().createQuery("FROM Person", Person.class)
-//                    .getResultStream().filter(p -> p.getPersonTypes().contains(Person.PersonType.Client))
-//                    .findAny().orElseThrow());
     /*@Getter */private static final SimpleObjectProperty<Person> participant = new SimpleObjectProperty<>();
 //        new SimpleObjectProperty<>(clientProperty().get()); // TODO: default to client
     /*@Getter */private static final SimpleObjectProperty<Racket> racket = new SimpleObjectProperty<>();

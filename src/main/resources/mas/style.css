@@ -1,5 +1,5 @@
 .title {
-    -fx-font-size: 36px;
+    -fx-font-size: 24px;
     -fx-font-weight: BOLD;
 }
 
@@ -42,4 +42,9 @@
 
 .combo-box-popup .list-cell:disabled  {
     -fx-opacity: 0.4 ;
+}
+
+.solid-border {
+    -fx-border-color: black;
+    -fx-padding: 10;
 }
