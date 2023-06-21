@@ -37,7 +37,6 @@ public class CourtReservationApp extends Application {
             CourtReservationApp.stage.show();
         });
 
-        // TODO: Change to "start.fxml"
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("start.fxml")));
         CourtReservationApp.stage.setScene(new Scene(root, 600, 400));
         CourtReservationApp.stage.setMinWidth(200);
@@ -52,7 +51,6 @@ public class CourtReservationApp extends Application {
         DBController.INSTANCE.setEm(entityManagerFactory.createEntityManager());
         try {
 
-            // TODO: remove seeding
 //            DBController.INSTANCE.seedDb();
             launch(args);
 

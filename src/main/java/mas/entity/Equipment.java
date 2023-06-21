@@ -50,8 +50,7 @@ public abstract class Equipment {
     }
 
     public Equipment[] getAvailable(LocalDateTime time, Duration duration) {
-        // TODO: get available equipment
-        throw new UnsupportedOperationException("Not implemented.");
+        throw new UnsupportedOperationException("Not implemented, out of project scope.");
 //        return new Equipment[]{};
     }
 

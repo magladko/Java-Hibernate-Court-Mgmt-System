@@ -144,7 +144,6 @@ public class CourtReservationController {
 
         racketReservationControlsRefresh();
 
-        // FIXME: fix racket selection (Racket can be selected even if it's not available)
         weakAdapter.<Racket>addChangeListener(racketComboBox.getSelectionModel().selectedItemProperty(), (observable, oldValue, newValue) -> {
             if (newValue == null) return;
             var court = SessionData.courtProperty().getValue();
