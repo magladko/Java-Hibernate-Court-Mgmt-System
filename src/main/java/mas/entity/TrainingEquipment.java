@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 /**
  * Represents a training equipment used in a tennis court management application.
  * It extends the Equipment class.
