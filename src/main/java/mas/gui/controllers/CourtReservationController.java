@@ -30,7 +30,6 @@ import java.util.Optional;
 
 public class CourtReservationController {
 
-    @FXML private Button cancelButton;
     @FXML private DatePicker datePicker;
     @FXML private TableView<Court> availabilityTable;
     @FXML private TableColumn<Court, Integer> courtNumberColumn;

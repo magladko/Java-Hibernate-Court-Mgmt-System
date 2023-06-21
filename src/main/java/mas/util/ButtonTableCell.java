@@ -5,9 +5,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import mas.entity.Court;
 
+/**
+ * Custom TableCell implementation for a Tennis Court button cell.
+ */
 public class ButtonTableCell extends TableCell<Court, Integer> {
     private final Button button;
 
+    /**
+     * Constructs a new instance of ButtonTableCell.
+     */
     public ButtonTableCell() {
         this.button = new Button();
         button.textProperty().bind(this.itemProperty().asString());
@@ -26,6 +32,9 @@ public class ButtonTableCell extends TableCell<Court, Integer> {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void updateItem(Integer item, boolean empty) {
         super.updateItem(item, empty);
