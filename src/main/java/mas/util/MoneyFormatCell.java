@@ -1,6 +1,7 @@
 package mas.util;
 
 import javafx.scene.control.TableCell;
+import mas.entity.Court;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -9,9 +10,8 @@ import java.text.NumberFormat;
  * This class is a custom TableCell for displaying BigDecimal values as formatted currency in a TableView.
  * It is used in the Tennis Courts management application to format money values in the UI.
  *
- * @param <Court> the type of the TableView row items
  */
-public class MoneyFormatCell<Court> extends TableCell<Court, BigDecimal> {
+public class MoneyFormatCell extends TableCell<Court, BigDecimal> {
 
     /**
      * Updates the item value of the TableCell and displays it as formatted currency.
