@@ -62,7 +62,7 @@ public class Reservation {
     private Person participant;
 
     public void setParticipant(Person participant) {
-        if (!participant.getPersonTypes().contains(Person.PersonType.Participant))
+        if (!participant.getPersonTypes().contains(Person.PersonType.PARTICIPANT))
             throw new TypeMismatchException("Person is not a participant");
 
         if (this.getParticipant() != null && this.getParticipant().equals(participant)) return;
@@ -76,7 +76,7 @@ public class Reservation {
     private Person client;
 
     public void setClient(Person client) {
-        if (client != null && !client.getPersonTypes().contains(Person.PersonType.Client))
+        if (client != null && !client.getPersonTypes().contains(Person.PersonType.CLIENT))
             throw new TypeMismatchException("Person is not a client");
 
         if (this.getClient() != null && this.getClient().equals(client)) return;
@@ -109,9 +109,9 @@ public class Reservation {
 
     public static Reservation makeReservation(LocalDateTime start, Duration duration, Court court, Racket racket,
                                               Person client, Person participant, String comment) throws TimeUnavailableException, TypeMismatchException {
-        if (!client.getPersonTypes().contains(Person.PersonType.Client))
+        if (!client.getPersonTypes().contains(Person.PersonType.CLIENT))
             throw new TypeMismatchException("First argument person type is not Client.");
-        if (!participant.getPersonTypes().contains(Person.PersonType.Participant))
+        if (!participant.getPersonTypes().contains(Person.PersonType.PARTICIPANT))
             throw new TypeMismatchException("Second argument person type is not Participant.");
 
         if (!court.isAvailable(start, duration))

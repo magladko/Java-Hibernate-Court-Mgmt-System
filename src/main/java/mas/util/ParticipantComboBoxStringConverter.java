@@ -9,9 +9,9 @@ public class ParticipantComboBoxStringConverter extends StringConverter<Person> 
     @Override
     public String toString(Person person) {
         if (person == null) return "";
-        if (person.getPersonTypes().contains(Person.PersonType.Client)) {
+        if (person.getPersonTypes().contains(Person.PersonType.CLIENT)) {
             return "Klient: " + person.getName() + " " + person.getSurname();
-        } else if (person.getPersonTypes().contains(Person.PersonType.Participant)) {
+        } else if (person.getPersonTypes().contains(Person.PersonType.PARTICIPANT)) {
             String result = "Uczestnik: " + person.getName() + " " + person.getSurname();
             if (person.getBirthday() != null) {
                 result += " (" + person.getBirthday() + ")";

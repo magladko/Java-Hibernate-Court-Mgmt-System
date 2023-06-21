@@ -1,20 +1,14 @@
 package mas.gui.controllers;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.util.StringConverter;
-import mas.CourtReservationApp;
 import mas.entity.Person;
 import mas.util.DBController;
 import mas.util.SessionData;
 import mas.util.Util;
-
-import java.io.IOException;
-import java.util.Objects;
 
 public class StartController {
 
@@ -26,7 +20,7 @@ public class StartController {
 
     @FXML
     public void initialize() {
-        clientChoiceBox.getItems().setAll(DBController.INSTANCE.getEm().createQuery("from Person", Person.class).getResultStream().filter(p -> p.getPersonTypes().contains(Person.PersonType.Client)).toList());
+        clientChoiceBox.getItems().setAll(DBController.INSTANCE.getEm().createQuery("from Person", Person.class).getResultStream().filter(p -> p.getPersonTypes().contains(Person.PersonType.CLIENT)).toList());
         clientChoiceBox.getSelectionModel().selectFirst();
         clientChoiceBox.setConverter(new StringConverter<>() {
             @Override
@@ -49,7 +43,7 @@ public class StartController {
     public void seedDbClick() {
         try {
             DBController.INSTANCE.seedDb();
-            clientChoiceBox.getItems().setAll(DBController.INSTANCE.getEm().createQuery("from Person", Person.class).getResultStream().filter(p -> p.getPersonTypes().contains(Person.PersonType.Client)).toList());
+            clientChoiceBox.getItems().setAll(DBController.INSTANCE.getEm().createQuery("from Person", Person.class).getResultStream().filter(p -> p.getPersonTypes().contains(Person.PersonType.CLIENT)).toList());
             clientChoiceBox.getSelectionModel().selectFirst();
         } catch(Exception e) {
             seedDBButton.setDisable(true);

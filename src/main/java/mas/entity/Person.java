@@ -3,7 +3,6 @@ package mas.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.TypeMismatchException;
 
@@ -18,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class Person {
 
-    public enum PersonType { Client, Participant }
+    public enum PersonType {CLIENT, PARTICIPANT}
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -50,14 +49,14 @@ public class Person {
         if (owningClient == this.getOwningClient()) return;
 
         if (owningClient == null) {
-            if (!this.getPersonTypes().contains(PersonType.Client) && this.getPersonTypes().contains(PersonType.Participant))
+            if (!this.getPersonTypes().contains(PersonType.CLIENT) && this.getPersonTypes().contains(PersonType.PARTICIPANT))
                 throw new TypeMismatchException("This Person object is only a Participant and must have a Client");
             this.getOwningClient().removeParticipants(this);
             this.owningClient = null;
         } else {
-            if (!owningClient.getPersonTypes().contains(PersonType.Client))
+            if (!owningClient.getPersonTypes().contains(PersonType.CLIENT))
                 throw new TypeMismatchException("Given Person is not a Client");
-            if (!this.getPersonTypes().contains(PersonType.Participant))
+            if (!this.getPersonTypes().contains(PersonType.PARTICIPANT))
                 throw new TypeMismatchException("This Person object is not a Participant");
 
             this.owningClient = owningClient;
@@ -71,9 +70,9 @@ public class Person {
     public void addParticipants(Person... ownedParticipants) {
         for (Person p : ownedParticipants) {
             if (!this.getOwnedParticipants().contains(p)) {
-                if (!p.getPersonTypes().contains(PersonType.Participant))
+                if (!p.getPersonTypes().contains(PersonType.PARTICIPANT))
                     throw new TypeMismatchException("Given Person is not a Participant");
-                if (!this.getPersonTypes().contains(PersonType.Client))
+                if (!this.getPersonTypes().contains(PersonType.CLIENT))
                     throw new TypeMismatchException("This Person object is not a Client");
                 this.getOwnedParticipants().add(p);
                 p.setOwningClient(this);
@@ -98,21 +97,11 @@ public class Person {
         removeParticipants(ownedParticipants);
     }
 
-//    public void addParticipant(@NonNull Person participant) {
-//        if (!participant.getPersonTypes().contains(PersonType.Participant))
-//            throw new TypeMismatchException("Given Person is not a Participant");
-//        if (!getPersonTypes().contains(PersonType.Client))
-//            throw new TypeMismatchException("This Person object is not a Client");
-//
-//        getOwnedParticipants().add(participant);
-//        participant.setOwningClient(this);
-//    }
-
     @OneToMany(mappedBy = "client")
     private Set<Reservation> reservationsBought = new HashSet<>();
 
     public void addReservationsBought(Reservation... reservationsBought) {
-        if (!this.getPersonTypes().contains(PersonType.Client))
+        if (!this.getPersonTypes().contains(PersonType.CLIENT))
             throw new TypeMismatchException("This Person object is not a Client");
 
         for (Reservation r : reservationsBought) {
@@ -126,7 +115,7 @@ public class Person {
     }
 
     public void removeReservationsBought(Reservation... reservationsBought) {
-        if (!this.getPersonTypes().contains(PersonType.Client))
+        if (!this.getPersonTypes().contains(PersonType.CLIENT))
             throw new TypeMismatchException("This Person object is not a Client");
 
         for (Reservation r : reservationsBought) {
@@ -150,15 +139,6 @@ public class Person {
             }
         }
     }
-
-//    public void removeReservations(Reservation... reservations) {
-//        for (Reservation r : reservations) {
-//            if (this.getReservations().contains(r)) {
-//                this.getReservations().remove(r);
-//                r.setParticipant(null);
-//            }
-//        }
-//    }
 
     @ManyToMany(mappedBy = "participants")
     private Set<Training> trainings = new HashSet<>();
@@ -187,7 +167,7 @@ public class Person {
     private Set<Training> trainingsBought = new HashSet<>();
 
     public void addTrainingsBought(Training... trainingsBought) {
-        if (!this.getPersonTypes().contains(PersonType.Client))
+        if (!this.getPersonTypes().contains(PersonType.CLIENT))
             throw new TypeMismatchException("This Person object is not a Client");
 
         for (Training t : trainingsBought) {
@@ -201,7 +181,7 @@ public class Person {
     }
 
     public void removeTrainingsBought(Training... trainingsBought) {
-        if (!this.getPersonTypes().contains(PersonType.Client))
+        if (!this.getPersonTypes().contains(PersonType.CLIENT))
             throw new TypeMismatchException("This Person object is not a Client");
 
         for (Training t : trainingsBought) {
@@ -232,7 +212,7 @@ public class Person {
      * @return Newly registered client.
      */
     public static Person registerClient(String name, String surname, String phoneNr, String email) {
-        return new Person(new PersonType[]{ PersonType.Client, PersonType.Participant },
+        return new Person(new PersonType[]{ PersonType.CLIENT, PersonType.PARTICIPANT},
                           name, surname, phoneNr, email, null, null);
     }
 
@@ -255,7 +235,7 @@ public class Person {
      * @return Newly registered participant.
      */
     public static Person registerParticipant(String name, String surname, LocalDate birthday, Person client) {
-        return new Person(new PersonType[]{ PersonType.Participant }, name, surname, null, null, birthday, client);
+        return new Person(new PersonType[]{ PersonType.PARTICIPANT}, name, surname, null, null, birthday, client);
     }
 
     /**
@@ -278,10 +258,10 @@ public class Person {
      * @throws TypeMismatchException Exception thrown if the Person is not a Participant.
      */
     public boolean registerAsClient(String phoneNr, String email) throws TypeMismatchException {
-        if (getPersonTypes().contains(PersonType.Client)) return true;
-        if (!getPersonTypes().contains(PersonType.Participant))
+        if (getPersonTypes().contains(PersonType.CLIENT)) return true;
+        if (!getPersonTypes().contains(PersonType.PARTICIPANT))
             throw new TypeMismatchException("Person is not a participant.");
-        getPersonTypes().add(PersonType.Client);
+        getPersonTypes().add(PersonType.CLIENT);
         setPhoneNr(phoneNr);
         setEmail(email);
 
@@ -296,10 +276,10 @@ public class Person {
      * @return True if Person is registered as Client (or has already been one), false otherwise.
      */
     public boolean registerAsParticipant(LocalDate birthday) {
-        if (getPersonTypes().contains(PersonType.Participant)) return true;
-        if (!getPersonTypes().contains(PersonType.Client))
+        if (getPersonTypes().contains(PersonType.PARTICIPANT)) return true;
+        if (!getPersonTypes().contains(PersonType.CLIENT))
             throw new TypeMismatchException("Person is not a client.");
-        getPersonTypes().add(PersonType.Participant);
+        getPersonTypes().add(PersonType.PARTICIPANT);
         setBirthday(birthday);
         return true;
     }
@@ -315,7 +295,7 @@ public class Person {
 
     @Override
     public String toString() {
-        if (getPersonTypes().contains(PersonType.Client) && getPersonTypes().contains(PersonType.Participant)) {
+        if (getPersonTypes().contains(PersonType.CLIENT) && getPersonTypes().contains(PersonType.PARTICIPANT)) {
             return "Client(Participant){" +
                     "name='" + name + '\'' +
                     ", surname='" + surname + '\'' +
@@ -324,7 +304,7 @@ public class Person {
                     ", birthday=" + birthday +
                     ", ownedParticipants=" + ownedParticipants.stream().map(p -> p.getName() + " " + p.getSurname()).toList() +
                     '}';
-        } else if (getPersonTypes().contains(PersonType.Participant)) {
+        } else if (getPersonTypes().contains(PersonType.PARTICIPANT)) {
             return "Participant{" +
                     "name='" + name + '\'' +
                     ", surname='" + surname + '\'' +
@@ -341,12 +321,12 @@ public class Person {
         if (!(o instanceof Person person)) return false;
 
         if (!getPersonTypes().equals(person.getPersonTypes())) return false;
-        if (getPersonTypes().contains(PersonType.Client)) {
+        if (getPersonTypes().contains(PersonType.CLIENT)) {
             // Client
             if (!getPhoneNr().equals(person.getPhoneNr())) return false;
         }
 
-        if (getPersonTypes().contains(PersonType.Participant)) {
+        if (getPersonTypes().contains(PersonType.PARTICIPANT)) {
             // Participant
             if (!getName().equals(person.getName())) return false;
             if (!getSurname().equals(person.getSurname())) return false;

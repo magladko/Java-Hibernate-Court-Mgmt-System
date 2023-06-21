@@ -83,7 +83,7 @@ public class Training {
 
     public void addClients(Person... clients) {
         for (Person c : clients) {
-            if (!c.getPersonTypes().contains(Person.PersonType.Client))
+            if (!c.getPersonTypes().contains(Person.PersonType.CLIENT))
                 throw new TypeMismatchException("Person referred as client is not a Client instance");
 
             if (!this.getClients().contains(c)) {
@@ -108,7 +108,7 @@ public class Training {
 
     public void addParticipants(Person... participants) {
         for (Person p : participants) {
-            if (!p.getPersonTypes().contains(Person.PersonType.Participant))
+            if (!p.getPersonTypes().contains(Person.PersonType.PARTICIPANT))
                 throw new TypeMismatchException("Person referred as participant is not a Participant instance");
 
             if (!this.getParticipants().contains(p)) {
@@ -145,9 +145,9 @@ public class Training {
                                            LocalDateTime from, Duration duration) {
         if (!trainer.isAvailable(from, duration)) throw new TimeUnavailableException(trainer, from, duration);
         if (!court.isAvailable(from, duration)) throw new TimeUnavailableException(court, from, duration);
-        if (!client.getPersonTypes().contains(Person.PersonType.Client))
+        if (!client.getPersonTypes().contains(Person.PersonType.CLIENT))
             throw new TypeMismatchException("Person referred as client is not a Client instance");
-        if (!participant.getPersonTypes().contains(Person.PersonType.Participant))
+        if (!participant.getPersonTypes().contains(Person.PersonType.PARTICIPANT))
             throw new TypeMismatchException("Person referred as participant is not a Participant instance");
 
         return new Training(from, duration, trainer, court, List.of(client), List.of(participant), List.of());
