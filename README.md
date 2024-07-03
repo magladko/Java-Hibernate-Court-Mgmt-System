@@ -5,7 +5,7 @@ Project developed as part of university course.
 
 GUI and project documentation is done in Polish, but code and comments are available in English.
 
-## Project documentation available: [HERE](https://html-preview.github.io/?url=https://github.com/magladko/Java-Hibernate-Court-Mgmt-System/blob/master/ProjectDocumentation.html)
+## Project documentation available (can be easily machine-translated): [HERE](https://html-preview.github.io/?url=https://github.com/magladko/Java-Hibernate-Court-Mgmt-System/blob/master/ProjectDocumentation.html)
 
 Implementation is done as **Java 17** with **Hibernate** **desktop application** utilizing a simple **H2 database** for data persistence.
 
